@@ -1,0 +1,208 @@
+# Note: --silent rather than --quiet to suppress module update diagnostics.
+#
+test.options += --no-default-options --serial-stop --silent --buildfile -
+
+# We disable bdep auto-synchronization since we will potentially be updating
+# the module from multiple parallel tests. Note that we've made sure it is
+# up-to-date by pre-loading it in the tests project (see root.build for
+# details).
+#
++export BDEP_SYNC=0
+
+# Note that we are using the libbuild2-autoconf-tests project as our
+# amalgamation in order to get the module import location and config.c.
+#
++cat <<EOI >=bootstrap.build
+  project = basics
+  #amalgamation =
+  subprojects =
+
+  version = 1.2.3
+  EOI
+
++cat <<EOI >=root.build
+  using c
+  using autoconf
+  EOI
+
+: basics-autoconf
+:
+mkdir build;
+ln -s ../../bootstrap.build ../../root.build build/;
+cat <<EOI >=config.h.in;
+  #define VERSION "@version@"
+
+  #undef TRUE
+  #undef FALSE
+  #undef ONE
+  #undef ZERO
+  #undef VALUE
+
+    #  undef  TRUE
+
+  #undef CUSTOM_LINE
+  #undef CUSTOM_BLOCK
+  EOI
+$* <<EOI &config.h &config.h.d;
+  ./: h{config}: in{config}
+  {
+    TRUE  = true
+    FALSE = [bool] false
+    ONE   = 1
+    ZERO  = [uint64] 000
+    VALUE = [uint64] 0123
+
+    CUSTOM_LINE = '#define CUSTOM 123'
+    CUSTOM_BLOCK = \
+  '
+  /* Make sure we do not redefine CUSTOM. */
+  #ifndef CUSTOM
+  #  define CUSTOM 123
+  #endif
+  '
+  }
+  EOI
+cat config.h >>EOO
+  #define VERSION "1.2.3"
+
+  #define TRUE 1
+  #undef FALSE
+  #define ONE 1
+  #undef ZERO
+  #define VALUE 123
+
+  #define TRUE 1
+
+  #define CUSTOM 123
+  /* Make sure we do not redefine CUSTOM. */
+  #ifndef CUSTOM
+  #  define CUSTOM 123
+  #endif
+  EOO
+
+: basics-cmake
+:
+mkdir build;
+ln -s ../../bootstrap.build ../../root.build build/;
+cat <<EOI >=config.h.in;
+  #define VERSION "@version@"
+
+  #cmakedefine TRUE
+  #cmakedefine FALSE
+  #cmakedefine ONE
+  #cmakedefine ZERO
+  #cmakedefine VALUE
+
+    #  cmakedefine  TRUE
+
+  #cmakedefine CUSTOM_LINE
+  #cmakedefine CUSTOM_BLOCK
+  #cmakedefine CUSTOM_BLOCK @version@
+
+  #cmakedefine TRUE  true
+  #cmakedefine FALSE false
+  #cmakedefine VALUE @VALUE@ /* @version@ */
+  EOI
+$* <<EOI &config.h &config.h.d;
+  ./: h{config}: in{config}
+  {
+    autoconf.flavor = cmake
+
+    TRUE  = true
+    FALSE = [bool] false
+    ONE   = 1
+    ZERO  = [uint64] 000
+    VALUE = [uint64] 0123
+
+    CUSTOM_LINE = '#define CUSTOM 123'
+    CUSTOM_BLOCK = \
+  '
+  /* Make sure we do not redefine CUSTOM. */
+  #ifndef CUSTOM
+  #  define CUSTOM 123
+  #endif
+  '
+  }
+  EOI
+cat config.h >>EOO
+  #define VERSION "1.2.3"
+
+  #define TRUE 1
+  #undef FALSE
+  #define ONE 1
+  #undef ZERO
+  #define VALUE 123
+
+  #define TRUE 1
+
+  #define CUSTOM 123
+  /* Make sure we do not redefine CUSTOM. */
+  #ifndef CUSTOM
+  #  define CUSTOM 123
+  #endif
+  /* Make sure we do not redefine CUSTOM. */
+  #ifndef CUSTOM
+  #  define CUSTOM 123
+  #endif
+
+  #define TRUE true
+  #undef FALSE
+  #define VALUE 123 /* 1.2.3 */
+  EOO
+
+: basics-meson
+:
+mkdir build;
+ln -s ../../bootstrap.build ../../root.build build/;
+cat <<EOI >=config.h.in;
+  #define VERSION "@version@"
+
+  #mesondefine TRUE
+  #mesondefine FALSE
+  #mesondefine ONE
+  #mesondefine ZERO
+  #mesondefine VALUE
+
+    #  mesondefine  TRUE
+
+  #mesondefine CUSTOM_LINE
+  #mesondefine CUSTOM_BLOCK
+  EOI
+$* <<EOI &config.h &config.h.d;
+  ./: h{config}: in{config}
+  {
+    autoconf.flavor = meson
+
+    TRUE  = true
+    FALSE = [bool] false
+    ONE   = 1
+    ZERO  = [uint64] 000
+    VALUE = [uint64] 0123
+
+    CUSTOM_LINE = '#define CUSTOM 123'
+    CUSTOM_BLOCK = \
+  '
+  /* Make sure we do not redefine CUSTOM. */
+  #ifndef CUSTOM
+  #  define CUSTOM 123
+  #endif
+  '
+  }
+  EOI
+cat config.h >>EOO
+  #define VERSION "1.2.3"
+
+  #define TRUE 1
+  #undef FALSE
+  #define ONE 1
+  #undef ZERO
+  #define VALUE 123
+
+  #define TRUE 1
+
+  #define CUSTOM 123
+  /* Make sure we do not redefine CUSTOM. */
+  #ifndef CUSTOM
+  #  define CUSTOM 123
+  #endif
+  EOO

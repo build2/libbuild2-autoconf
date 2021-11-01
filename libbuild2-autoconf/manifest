@@ -1,0 +1,13 @@
+: 1
+name: libbuild2-autoconf
+version: 0.1.0-a.0.z
+project: build2
+summary: Autoconf emulation build system module for build2
+license: MIT ; MIT License.
+description-file: README.md
+url: https://github.com/build2/libbuild2-autoconf
+email: users@build2.org
+build-warning-email: builds@build2.org
+depends: * build2 >= 0.15.0-
+depends: * bpkg >= 0.15.0-
+tests: * libbuild2-autoconf-tests == $

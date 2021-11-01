@@ -1,0 +1,6 @@
+$out_root/
+{
+  include libbuild2/autoconf/
+}
+
+export $out_root/libbuild2/autoconf/$import.target
