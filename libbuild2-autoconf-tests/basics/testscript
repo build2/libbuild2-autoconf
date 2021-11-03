@@ -42,6 +42,9 @@ cat <<EOI >=config.h.in;
 
   #undef CUSTOM_LINE
   #undef CUSTOM_BLOCK
+
+  #undef HAVE_TEST_DUMMY1_H
+  #undef HAVE_TEST_DUMMY2_H
   EOI
 $* <<EOI &config.h &config.h.d;
   ./: h{config}: in{config}
@@ -60,6 +63,8 @@ $* <<EOI &config.h &config.h.d;
   #  define CUSTOM 123
   #endif
   '
+
+    HAVE_TEST_DUMMY2_H = '#define HAVE_TEST_DUMMY2_H 2'
   }
   EOI
 cat config.h >>EOO
@@ -78,6 +83,9 @@ cat config.h >>EOO
   #ifndef CUSTOM
   #  define CUSTOM 123
   #endif
+
+  #define HAVE_TEST_DUMMY1_H 1
+  #define HAVE_TEST_DUMMY2_H 2
   EOO
 
 : basics-cmake
@@ -102,6 +110,9 @@ cat <<EOI >=config.h.in;
   #cmakedefine TRUE  true
   #cmakedefine FALSE false
   #cmakedefine VALUE @VALUE@ /* @version@ */
+
+  #cmakedefine HAVE_TEST_DUMMY1_H @HAVE_TEST_DUMMY1_H@
+  #cmakedefine HAVE_TEST_DUMMY2_H
   EOI
 $* <<EOI &config.h &config.h.d;
   ./: h{config}: in{config}
@@ -122,6 +133,8 @@ $* <<EOI &config.h &config.h.d;
   #  define CUSTOM 123
   #endif
   '
+
+    HAVE_TEST_DUMMY2_H = '#define HAVE_TEST_DUMMY2_H 2'
   }
   EOI
 cat config.h >>EOO
@@ -148,6 +161,9 @@ cat config.h >>EOO
   #define TRUE true
   #undef FALSE
   #define VALUE 123 /* 1.2.3 */
+
+  #define HAVE_TEST_DUMMY1_H 1
+  #define HAVE_TEST_DUMMY2_H 2
   EOO
 
 : basics-meson
@@ -167,6 +183,9 @@ cat <<EOI >=config.h.in;
 
   #mesondefine CUSTOM_LINE
   #mesondefine CUSTOM_BLOCK
+
+  #mesondefine HAVE_TEST_DUMMY1_H
+  #mesondefine HAVE_TEST_DUMMY2_H
   EOI
 $* <<EOI &config.h &config.h.d;
   ./: h{config}: in{config}
@@ -187,6 +206,8 @@ $* <<EOI &config.h &config.h.d;
   #  define CUSTOM 123
   #endif
   '
+
+    HAVE_TEST_DUMMY2_H = '#define HAVE_TEST_DUMMY2_H 2'
   }
   EOI
 cat config.h >>EOO
@@ -205,4 +226,7 @@ cat config.h >>EOO
   #ifndef CUSTOM
   #  define CUSTOM 123
   #endif
+
+  #define HAVE_TEST_DUMMY1_H 1
+  #define HAVE_TEST_DUMMY2_H 2
   EOO

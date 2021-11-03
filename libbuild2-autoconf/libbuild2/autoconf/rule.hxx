@@ -33,6 +33,13 @@ namespace build2
                char,
                bool,
                const optional<string>&) const override;
+
+      virtual string
+      lookup (const location&,
+              action, const target&,
+              const string&,
+              optional<uint64_t>,
+              const optional<string>&) const override;
     };
   }
 }

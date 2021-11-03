@@ -4,6 +4,8 @@
 #include <libbuild2/algorithm.hxx>
 #include <libbuild2/diagnostics.hxx>
 
+using namespace std;
+
 namespace build2
 {
   namespace autoconf
@@ -99,11 +101,15 @@ namespace build2
                                       bool value = true) -> optional<bool>
       {
         // Note that we must be careful here with going too ad hoc since there
-        // is a parallel debdb validation logic in in::rule which calls
-        // substitute().
+        // is a parallel debdb change tracking logic in in::rule which calls
+        // substitute(). So we use the lookup flags to mark special
+        // substitutions.
         //
-        optional<string> ov (
-          substitute (l, a, t, dd, dd_skip, name, strict, null));
+        optional<string> ov (substitute (l,
+                                         a, t,
+                                         dd, dd_skip,
+                                         name, 1 /* flags */,
+                                         strict, null));
 
         assert (ov); // C identifier is a valid variable name.
         string& v (*ov);
@@ -133,15 +139,19 @@ namespace build2
 
           // Skip leading and trailing newlines.
           //
-          for (; v.back () == '\n'; v.pop_back ()) ;
-          for (p = 0; v[p] == '\n'; ++p) ;
+          for (; v.back () == '\n' || v.back () == '\r'; v.pop_back ()) ;
+          for (p = 0; v[p] == '\n' || v[p] == '\r'; ++p) ;
 
           for (;; ++p)
           {
             size_t b (p);
             p = v.find ('\n', p);
 
-            s.append (v, b, p - b);
+            size_t n (p == string::npos
+                      ? p
+                      : p - b - (v[p - 1] == '\r' ? 1 : 0));
+
+            s.append (v, b, n);
 
             if (p == string::npos)
               break;
@@ -159,13 +169,15 @@ namespace build2
         }
         else
         {
-          if (v == "true")
-            v = "1";
-
           s = "#define ";
           s += name;
           if (value)
           {
+            if (v == "true")
+              v = "1";
+            else if (v != "1")
+              replace_newlines (v, nl);
+
             s += ' ';
             s += v;
           }
@@ -350,6 +362,63 @@ namespace build2
       }
 
       in::rule::process (l, a, t, dd, dd_skip, s, b, nl, sym, strict, null);
+    }
+
+    struct check
+    {
+      const char* name;
+      const char* value;
+    };
+
+    // Note: must be sorted.
+    //
+    const check checks[] = {
+      {"HAVE_TEST_DUMMY1_H", "#define HAVE_TEST_DUMMY1_H 1"},
+      {"HAVE_TEST_DUMMY2_H", "#define HAVE_TEST_DUMMY2_H 1"},
+    };
+
+    string rule::
+    lookup (const location& l,
+            action a, const target& t,
+            const string& n,
+            optional<uint64_t> flags,
+            const optional<string>& null) const
+    {
+      if (flags)
+      {
+        assert (*flags == 1);
+
+        // If this is a special substitution, then look in our catalog of
+        // built-in checks. Specifically, the plan is as follows:
+        //
+        // 1. Look in the catalog and fall through if not found.
+        //
+        // 2. If found, then check for a custom value falling through if
+        //    found.
+        //
+        //    Here things get a bit tricky: while a stray HAVE_* buildfile
+        //    variable is unlikely, something like const or volatile is
+        //    possible. Since there is no way to undefine a buildfile variable
+        //    (becasue we could always see a value from the outer scope), we
+        //    will treat null as an indication to use the built-in check.
+        //    While this clashes with the in.null semantics, it'ss just as
+        //    easy to set the variable to the real default value as to null.
+        //
+        // 3. Return the build-in value form the catalog.
+        //
+        const check* e (checks + sizeof (checks) / sizeof (*checks));
+        const check* i (lower_bound (checks, e,
+                                     n,
+                                     [] (const check& c, const string& n)
+                                     {
+                                       return n.compare (c.name) > 0;
+                                     }));
+
+        if (i != e && n == i->name && !t[n])
+          return i->value;
+      }
+
+      return in::rule::lookup (l, a, t, n, nullopt, null);
     }
   }
 }
