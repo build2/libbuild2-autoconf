@@ -237,6 +237,16 @@ namespace build2
               substitute_special (name);
               return;
             }
+            else if (s.compare (i, 11, "cmakedefine") == 0)
+            {
+              warn (l) << "#cmakedefine in autoconf configuration file" <<
+                info << "did you forget to specify autoconf.flavor=cmake?";
+            }
+            else if (s.compare (i, 11, "mesondefine") == 0)
+            {
+              warn (l) << "#mesondefine in autoconf configuration file" <<
+                info << "did you forget to specify autoconf.flavor=meson?";
+            }
           }
           break;
         }
