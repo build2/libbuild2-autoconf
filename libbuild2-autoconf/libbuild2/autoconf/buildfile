@@ -54,23 +54,32 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
   #include <libbuild2/autoconf/checks.hxx>
 
   const build2::autoconf::check build2::autoconf::checks[$n] = {
-  {\"\", \"\"
+  {
+  \"\",
+
+  \"\"
   EOI
 
   # @@ TODO: add \n once sed supports it.
   #
   cat $i | sed -n \
-    -e 's|^// ([^ ]+) *$|},{"\1",|p' \
+    -e 's|^// ([^ ]+) *$|},\n\n{\n"\1",\n|p' \
     -e 's|^(.*)\\$|"\1\\\\\\n"|p' \
     -e 's|^(.*)$|"\1\\n"|p' \
     - >>$s
 
   cat <<EOI >>$s
   },
-  {"zzz_TEST_DUMMY1_H",
+
+  {
+  "zzz_TEST_DUMMY1_H",
+
   "#define zzz_TEST_DUMMY1_H 1"
   },
-  {"zzz_TEST_DUMMY2_H",
+
+  {
+  "zzz_TEST_DUMMY2_H",
+
   "#define zzz_TEST_DUMMY2_H 1"
   }
   };
