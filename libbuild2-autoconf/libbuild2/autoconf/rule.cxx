@@ -4,6 +4,8 @@
 #include <libbuild2/algorithm.hxx>
 #include <libbuild2/diagnostics.hxx>
 
+#include <libbuild2/autoconf/checks.hxx>
+
 using namespace std;
 
 namespace build2
@@ -363,19 +365,6 @@ namespace build2
 
       in::rule::process (l, a, t, dd, dd_skip, s, b, nl, sym, strict, null);
     }
-
-    struct check
-    {
-      const char* name;
-      const char* value;
-    };
-
-    // Note: must be sorted.
-    //
-    const check checks[] = {
-      {"HAVE_TEST_DUMMY1_H", "#define HAVE_TEST_DUMMY1_H 1"},
-      {"HAVE_TEST_DUMMY2_H", "#define HAVE_TEST_DUMMY2_H 1"},
-    };
 
     string rule::
     lookup (const location& l,

@@ -1,0 +1,2 @@
+// inline
+#undef inline

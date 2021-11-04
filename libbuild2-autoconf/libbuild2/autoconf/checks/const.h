@@ -1,0 +1,2 @@
+// const
+#undef const
