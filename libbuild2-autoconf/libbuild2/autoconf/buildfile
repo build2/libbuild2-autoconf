@@ -60,8 +60,6 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
   \"\"
   EOI
 
-  # @@ TODO: add \n once sed supports it.
-  #
   cat $i | sed -n \
     -e 's|^// ([^ ]+) *$|},\n\n{\n"\1",\n|p' \
     -e 's|^(.*)\\$|"\1\\\\\\n"|p' \

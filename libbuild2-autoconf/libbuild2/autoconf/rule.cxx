@@ -4,6 +4,8 @@
 #include <libbuild2/algorithm.hxx>
 #include <libbuild2/diagnostics.hxx>
 
+#include <libbuild2/in/target.hxx>
+
 #include <libbuild2/autoconf/checks.hxx>
 
 using namespace std;
@@ -34,22 +36,44 @@ namespace build2
     recipe rule::
     apply (action a, target& t) const
     {
+      recipe r (in::rule::apply (a, t));
+
       // Determine and cache the configuration file flavor.
       //
       flavor f (flavor::autoconf);
+
       if (const string* s = cast_null<string> (t["autoconf.flavor"]))
       {
-        if (*s == "cmake")
-          f = flavor::cmake;
-        else if (*s == "meson")
-          f = flavor::meson;
+        if      (*s == "cmake") f = flavor::cmake;
+        else if (*s == "meson") f = flavor::meson;
         else if (*s != "autoconf")
           fail << "invalid configuration file flavor '" << *s << "'";
+      }
+      else
+      {
+        // If the in{} file extension is either .cmake or .meson, then
+        // use that as the flavor.
+        //
+        for (const target* pt: t.prerequisite_targets[a])
+        {
+          if (pt != nullptr)
+          {
+            if (const auto* it = pt->is_a<in::in> ())
+            {
+              string e (it->path ().extension ());
+
+              if      (e == "cmake") f = flavor::cmake;
+              else if (e == "meson") f = flavor::meson;
+
+              break;
+            }
+          }
+        }
       }
 
       t.data (match_data {f});
 
-      return in::rule::apply (a, t);
+      return r;
     }
 
     void rule::

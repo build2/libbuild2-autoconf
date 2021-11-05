@@ -9,7 +9,7 @@ namespace build2
 {
   namespace autoconf
   {
-    // Process a config.h.in file.
+    // Process a config.h.{in,cmake,meson} file.
     //
     // Note that to be usable as a drop-in replacement we make the default
     // substitution symbol '@' and the mode -- lax. The user, however, is

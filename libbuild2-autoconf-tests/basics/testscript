@@ -92,7 +92,7 @@ cat config.h >>EOO
 :
 mkdir build;
 ln -s ../../bootstrap.build ../../root.build build/;
-cat <<EOI >=config.h.in;
+cat <<EOI >=config.h.cmake;
   #define VERSION "@version@"
 
   #cmakedefine TRUE
@@ -115,10 +115,8 @@ cat <<EOI >=config.h.in;
   #cmakedefine zzz_TEST_DUMMY2_H
   EOI
 $* <<EOI &config.h &config.h.d;
-  ./: h{config}: in{config}
+  ./: h{config}: in{config.h.cmake}
   {
-    autoconf.flavor = cmake
-
     TRUE  = true
     FALSE = [bool] false
     ONE   = 1
