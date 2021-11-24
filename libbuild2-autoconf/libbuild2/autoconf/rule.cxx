@@ -1,5 +1,8 @@
 #include <libbuild2/autoconf/rule.hxx>
 
+#include <cstring> // strcmp()
+
+#include <libbuild2/depdb.hxx>
 #include <libbuild2/target.hxx>
 #include <libbuild2/algorithm.hxx>
 #include <libbuild2/diagnostics.hxx>
@@ -19,10 +22,8 @@ namespace build2
     struct match_data
     {
       autoconf::flavor flavor;
+      string           prefix;
     };
-
-    static_assert (sizeof (match_data) <= target::data_size,
-                   "insufficient space");
 
     rule::
     rule ()
@@ -31,6 +32,8 @@ namespace build2
                     '@'   /* symbol */,
                     false /* strict */)
     {
+      static_assert (sizeof (match_data) <= target::data_size,
+                     "insufficient space");
     }
 
     recipe rule::
@@ -71,9 +74,39 @@ namespace build2
         }
       }
 
-      t.data (match_data {f});
+      // Get the prefix if any.
+      //
+      string p (cast_empty<string> (t["autoconf.prefix"]));
+
+      t.data (match_data {f, move (p)});
 
       return r;
+    }
+
+    void rule::
+    perform_update_depdb (action, const target& t, depdb& dd) const
+    {
+      tracer trace ("autoconf::rule::perform_update_depdb");
+
+      const match_data& md (t.data<match_data> ());
+
+      // Then the flavor.
+      //
+      if (dd.expect (md.flavor == flavor::autoconf ? "autoconf" :
+                     md.flavor == flavor::cmake    ? "cmake" :
+                     "meson") != nullptr)
+        l4 ([&]{trace << "flavor mismatch forcing update of" << t;});
+
+      // Then the prefix.
+      //
+      if (dd.expect (md.prefix) != nullptr)
+        l4 ([&]{trace << "prefix mismatch forcing update of" << t;});
+
+      // Note that at first it may seem necessary to add something like the
+      // full module version in lieu of the built-in checks database hash.
+      // Note, however, that any changes will be automatically taken care of
+      // (and with better precision) as part of the substituted variable value
+      // checks by in::rule.
     }
 
     void rule::
@@ -424,21 +457,63 @@ namespace build2
         //    possible. Since there is no way to undefine a buildfile variable
         //    (becasue we could always see a value from the outer scope), we
         //    will treat null as an indication to use the built-in check.
-        //    While this clashes with the in.null semantics, it'ss just as
+        //    While this clashes with the in.null semantics, it's just as
         //    easy to set the variable to the real default value as to null.
         //
         // 3. Return the build-in value form the catalog.
         //
-        const check* e (checks + sizeof (checks) / sizeof (*checks));
-        const check* i (lower_bound (checks, e,
-                                     n,
-                                     [] (const check& c, const string& n)
-                                     {
-                                       return n.compare (c.name) > 0;
-                                     }));
+        const char* pn (nullptr); // Prefix-less name.
 
-        if (i != e && n == i->name && !t[n])
-          return i->value;
+        const string& p (t.data<match_data> ().prefix);
+        if (!p.empty ())
+        {
+          // Note that if there is no prefix, then we don't look for a
+          // built-in check.
+          //
+          if (n.size () > p.size () && n.compare (0, p.size (), p) == 0)
+            pn = n.c_str () + p.size ();
+        }
+        else
+          pn = n.c_str ();
+
+        if (pn != nullptr)
+        {
+          const check* e (checks + sizeof (checks) / sizeof (*checks));
+          const check* i (lower_bound (checks, e,
+                                       pn,
+                                       [] (const check& c, const char* pn)
+                                       {
+                                         return strcmp (c.name, pn) < 0;
+                                       }));
+
+          // Note: original name in lookup.
+          //
+          if (i != e && strcmp (i->name, pn) == 0 && !t[n])
+          {
+            string r (i->value);
+
+            // Add "back" the prefix.
+            //
+            if (!p.empty ())
+            {
+              auto sep = [] (char c) { return !alnum (c) && c != '_'; };
+
+              size_t m (n.size () - p.size ()); // Prefix-less name length.
+
+              for (size_t i (0); (i = r.find (pn, i)) != string::npos; i += m)
+              {
+                if ((i     == 0         || sep (r[i - 1])) &&
+                    (i + m == r.size () || sep (r[i + m])))
+                {
+                  r.insert (i, p);
+                  i += p.size ();
+                }
+              }
+            }
+
+            return r;
+          }
+        }
       }
 
       return in::rule::lookup (l, a, t, n, nullopt, null);

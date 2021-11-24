@@ -228,3 +228,24 @@ cat config.h >>EOO
   #define zzz_TEST_DUMMY1_H 1
   #define zzz_TEST_DUMMY2_H 2
   EOO
+
+: prefix
+:
+mkdir build;
+ln -s ../../bootstrap.build ../../root.build build/;
+cat <<EOI >=config.h.in;
+  #undef PREFIX_zzz_TEST_DUMMY1_H
+  #undef PREFIX_zzz_TEST_DUMMY2_H
+  EOI
+$* <<EOI &config.h &config.h.d;
+  ./: h{config}: in{config}
+  {
+    autoconf.prefix = PREFIX_
+
+    PREFIX_zzz_TEST_DUMMY2_H = '#define PREFIX_zzz_TEST_DUMMY2_H 2'
+  }
+  EOI
+cat config.h >>EOO
+  #define PREFIX_zzz_TEST_DUMMY1_H 1
+  #define PREFIX_zzz_TEST_DUMMY2_H 2
+  EOO

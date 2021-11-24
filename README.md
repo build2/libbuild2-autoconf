@@ -57,6 +57,16 @@ specified as `buildfile` variables in the same way as with the
 [`in`][module-in] module. For example:
 
 ```
+/* config.h.in */
+
+#define PACKAGE_NAME @PACKAGE_NAME@
+#define PACKAGE_VERSION @PACKAGE_VERSION@
+
+#undef HAVE_STRLCPY
+#undef HAVE_STRLCAT
+```
+
+```
 h{config}: in{config}
 {
   PACKAGE_NAME = $project
@@ -72,6 +82,40 @@ h{config}: in{config}
   HAVE_STRLCPY = true
 }
 ```
+
+The build-in checks can be prefixed in order to avoid clashes with similarly
+named macros in other headers. This is an especially good idea if the
+resulting header is public. To enable this, we specify the prefix with
+the `autoconf.prefix` variable and then use the prefixed versions of
+the options in the `config.h.in` file. For example:
+
+```
+/* config.h.in */
+
+#undef LIBFOO_HAVE_STRLCPY
+#undef LIBFOO_HAVE_STRLCAT
+```
+
+```
+h{config}: in{config}
+{
+  autoconf.prefix = LIBFOO_
+}
+```
+
+Note that `autoconf.prefix` only affects the lookup of the built-in checks.
+Custom substitutions and overrides of build-in checks must include the
+prefix. For example:
+
+```
+h{config}: in{config}
+{
+  autoconf.prefix = LIBFOO_
+
+  LIBFOO_HAVE_STRLCPY = true
+}
+```
+
 
 ## Adding new checks
 
@@ -92,13 +136,20 @@ there should be no double-quotes or backslashes except for line
 continuations. For example:
 
 ```
-// HAVE_FOO
-#ifndef _WIN32
-#  define HAVE_FOO 1
+// HAVE_BAR
+#if !defined(_WIN32) || \
+     defined(__MINGW32__)
+#  define HAVE_BAR 1
 #else
-#  undef HAVE_FOO /* No foo on Windows. */
+#  undef HAVE_BAR /* No bar on Windows except with MinGW. */
 #endif
 ```
+
+Note also that the module implementation may need to replace `<NAME>` with its
+prefixed version if the `autoconf.prefix` functionality is in use (see above).
+This is done by textually substituting every occurrence of `<NAME>` that is
+separated on both left and right hand sides (that is, both characters
+immediately before and after `<NAME>` are not `[A-Za-z0-9_]`).
 
 [module-in]: https://build2.org/build2/doc/build2-build-system-manual.xhtml#module-in
 [proj-config]: https://build2.org/build2/doc/build2-build-system-manual.xhtml#proj-config

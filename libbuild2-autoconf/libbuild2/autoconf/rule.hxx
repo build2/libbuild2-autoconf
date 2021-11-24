@@ -25,6 +25,9 @@ namespace build2
       apply (action, target&) const override;
 
       virtual void
+      perform_update_depdb (action, const target&, depdb&) const override;
+
+      virtual void
       process (const location&,
                action, const target&,
                depdb&, size_t,

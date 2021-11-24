@@ -39,6 +39,10 @@ namespace build2
         // `cmake`, and `meson`.
         //
         vp.insert<string> ("autoconf.flavor");
+
+        // Built-in checks prefix.
+        //
+        vp.insert<string> ("autoconf.prefix");
       }
 
       // Register the rule.
