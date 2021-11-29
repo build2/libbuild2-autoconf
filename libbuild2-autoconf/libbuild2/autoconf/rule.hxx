@@ -30,7 +30,7 @@ namespace build2
       virtual void
       process (const location&,
                action, const target&,
-               depdb&, size_t,
+               depdb&, size_t&,
                string&, size_t,
                const char*,
                char,
