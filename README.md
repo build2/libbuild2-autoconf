@@ -137,11 +137,13 @@ continuations. For example:
 
 ```
 // HAVE_BAR
+
+#undef HAVE_BAR
+
+/* No bar on Windows except with MinGW. */
 #if !defined(_WIN32) || \
      defined(__MINGW32__)
 #  define HAVE_BAR 1
-#else
-#  undef HAVE_BAR /* No bar on Windows except with MinGW. */
 #endif
 ```
 
