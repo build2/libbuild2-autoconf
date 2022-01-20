@@ -14,8 +14,10 @@ program to check if the feature is present. Instead, they are set to static
 expected values based on the platform/compiler macro checks (see note at the
 beginning of [Project Configuration][proj-config] for rationale).
 
-See [`libbuild2/autoconf/checks/`][checks] for the list of available build-in
-checks.
+See [`libbuild2/autoconf/checks/`][checks] for the list of available built-in
+checks. Submit requests for new checks as issues. Submit implementations of
+new checks (or any other improvements) as PRs or patches.
+
 
 ## Using in your projects
 
@@ -74,7 +76,7 @@ h{config}: in{config}
 }
 ```
 
-This mechanism can also be used to override the build-in checks, for example:
+This mechanism can also be used to override the built-in checks, for example:
 
 ```
 h{config}: in{config}
@@ -83,7 +85,7 @@ h{config}: in{config}
 }
 ```
 
-The build-in checks can be prefixed in order to avoid clashes with similarly
+The built-in checks can be prefixed in order to avoid clashes with similarly
 named macros in other headers. This is an especially good idea if the
 resulting header is public. To enable this, we specify the prefix with
 the `autoconf.prefix` variable and then use the prefixed versions of
@@ -104,7 +106,7 @@ h{config}: in{config}
 ```
 
 Note that `autoconf.prefix` only affects the lookup of the built-in checks.
-Custom substitutions and overrides of build-in checks must include the
+Custom substitutions and overrides of built-in checks must include the
 prefix. For example:
 
 ```
@@ -116,24 +118,37 @@ h{config}: in{config}
 }
 ```
 
+Note also that some built-in check names are *unprefixable*, usually because
+they are standard macro names (for example, `BYTE_ORDER`) that on some
+platforms come from system headers (for example, `<sys/endian.h>` on FreeBSD).
+Such checks have `!` after their names on the first line of their
+implementation files (for example, `// BYTE_ORDER!`).
+
 
 ## Adding new checks
 
 To add a check for a new configuration option `<NAME>` simply create the
-`<NAME>.h` header file with the corresponding check and place it into
-[`libbuild2/autoconf/checks/`][checks] (use existing checks for inspiration).
+`<NAME>.h` header file (preserving the case) with the corresponding check and
+place it into [`libbuild2/autoconf/checks/`][checks] (use existing checks for
+inspiration).
 
 The first line in this header file must be in the form:
 
 ```
-// <NAME>
+// <NAME>[!] [: <BASE>...]
 ```
+
+If the name is followed by the `!` modifier, then it is *unprefixable* (see
+the previous section for detail). The name can also be followed by `:` and a
+list of base checks. Such checks are automatically inserted before the rest of
+the lines in the resulting substitution.
 
 Subsequent lines should be C-style comments or preprocessor directives that
 `#define` or `#undef` `<NAME>` depending on whether the feature is available
 (though there can be idiosyncrasies; see `const.h`, for example). Note that
 there should be no double-quotes or backslashes except for line
-continuations. For example:
+continuations. For example, to add a check for option `HAVE_BAR`, we could
+create the `HAVE_BAR.h` header file with the following content:
 
 ```
 // HAVE_BAR
@@ -148,10 +163,17 @@ continuations. For example:
 ```
 
 Note also that the module implementation may need to replace `<NAME>` with its
-prefixed version if the `autoconf.prefix` functionality is in use (see above).
-This is done by textually substituting every occurrence of `<NAME>` that is
-separated on both left and right hand sides (that is, both characters
-immediately before and after `<NAME>` are not `[A-Za-z0-9_]`).
+prefixed version (unless it is unprefixable) if the `autoconf.prefix`
+functionality is in use (see above). This is done by textually substituting
+every occurrence of `<NAME>` that is separated on both left and right hand
+sides (that is, both characters immediately before and after `<NAME>` are not
+`[A-Za-z0-9_]`).
+
+Within a file duplicate checks are automatically suppressed. And if multiple
+files are involved, then the user is expected to employ the `autoconf.prefix`
+functionality to avoid clashes across files. However, this does not help
+unprefixable names and, as a result, such checks should be implemented in
+ways that deal with duplication (for example, include guards).
 
 [module-in]: https://build2.org/build2/doc/build2-build-system-manual.xhtml#module-in
 [proj-config]: https://build2.org/build2/doc/build2-build-system-manual.xhtml#proj-config

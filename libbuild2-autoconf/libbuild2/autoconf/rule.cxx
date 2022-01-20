@@ -1,6 +1,6 @@
 #include <libbuild2/autoconf/rule.hxx>
 
-#include <cstring> // strcmp()
+#include <cstring> // strcmp(), strchr()
 
 #include <libbuild2/depdb.hxx>
 #include <libbuild2/target.hxx>
@@ -21,8 +21,9 @@ namespace build2
 
     struct match_data
     {
-      autoconf::flavor flavor;
-      string           prefix;
+      autoconf::flavor    flavor;
+      string              prefix;
+      map<string, string> checks; // Checks already seen.
     };
 
     rule::
@@ -78,7 +79,7 @@ namespace build2
       //
       string p (cast_empty<string> (t["autoconf.prefix"]));
 
-      t.data (match_data {f, move (p)});
+      t.data (match_data {f, move (p), {}});
 
       return r;
     }
@@ -174,21 +175,34 @@ namespace build2
         string& v (*ov);
 
         // As an extension, we allow replacing the entire line with a
-        // potentially multi-line block of preprocessor directives. To detect
-        // this, we look for a line that starts with `#` after whitespaces.
+        // potentially multi-line block of preprocessor directives or a
+        // single-line C comment (used to suppress duplicates). To detect the
+        // former, we look for a line that starts with `#` after whitespaces.
+        // To detect the latter, we look for a single line that starts with
+        // `/*`.
         //
         size_t p (0);
         for (;; ++p)
         {
+          bool c (p == 0);
+
           skip_ws (v, p);
 
           if (v[p] == '#')
             break;
 
+          if (c)
+            c = (v[p] == '/' && v[p + 1] == '*');
+
           p = v.find ('\n', p);
 
           if (p == string::npos)
+          {
+            if (c)
+              p = 0;
+
             break;
+          }
         }
 
         optional<bool> r;
@@ -444,12 +458,24 @@ namespace build2
       {
         assert (*flags == 1);
 
+        match_data& md (t.data<match_data> ());
+
         // If this is a special substitution, then look in our catalog of
         // built-in checks. Specifically, the plan is as follows:
         //
-        // 1. Look in the catalog and fall through if not found.
+        // 1. Suppress if a duplicate (we do it regardless of whether it is
+        //    from the catalog or custom).
         //
-        // 2. If found, then check for a custom value falling through if
+        //    Which name should we store, prefixed or prefixless? If we store
+        //    prefixed, then it won't be easy to match bases which are
+        //    specified without a prefix: we will have to add the prefix
+        //    unless the check is unprefixable, which we can only know by
+        //    looking it up. So we store prefixless. Actually, it's convenient
+        //    to store both.
+        //
+        // 2. Look in the catalog and fall through if not found.
+        //
+        // 3. If found, then check for a custom value falling through if
         //    found.
         //
         //    Here things get a bit tricky: while a stray HAVE_* buildfile
@@ -460,15 +486,15 @@ namespace build2
         //    While this clashes with the in.null semantics, it's just as
         //    easy to set the variable to the real default value as to null.
         //
-        // 3. Return the build-in value form the catalog.
+        // 4. Return the build-in value from the catalog.
         //
-        const char* pn (nullptr); // Prefix-less name.
+        const char* pn (nullptr); // Prefixless name.
 
-        const string& p (t.data<match_data> ().prefix);
+        const string& p (md.prefix);
         if (!p.empty ())
         {
-          // Note that if there is no prefix, then we don't look for a
-          // built-in check.
+          // Note that if there is no prefix, then we only look for an
+          // unprefixable built-in check.
           //
           if (n.size () > p.size () && n.compare (0, p.size (), p) == 0)
             pn = n.c_str () + p.size ();
@@ -476,31 +502,69 @@ namespace build2
         else
           pn = n.c_str ();
 
-        if (pn != nullptr)
+        const char* en (pn != nullptr ? pn : n.c_str ()); // Effective name.
+
+        // Note: this line must be recognizable by substitute_special().
+        //
+        if (md.checks.find (en) != md.checks.end ())
+          return "/* " + n + " already defined. */";
+
+        md.checks.emplace (en, n);
+
+        // If up is true, only look for an unprefixable check.
+        //
+        auto find = [] (const char* n, bool up = false) -> const check*
         {
           const check* e (checks + sizeof (checks) / sizeof (*checks));
           const check* i (lower_bound (checks, e,
-                                       pn,
-                                       [] (const check& c, const char* pn)
+                                       n,
+                                       [] (const check& c, const char* n)
                                        {
-                                         return strcmp (c.name, pn) < 0;
+                                         return strcmp (c.name, n) < 0;
                                        }));
 
-          // Note: original name in lookup.
+          return (i != e &&
+                  strcmp (i->name, n) == 0 &&
+                  (!up || strchr (i->modifier, '!') != nullptr)) ? i : nullptr;
+        };
+
+        // Note: original name in variable lookup.
+        //
+        const check* c (find (en, pn == nullptr));
+
+        if (c != nullptr && !t[n])
+        {
+          // The plan is as follows: keep adding base checks (suppressing
+          // duplicates) followed by the main check while prefixing all the
+          // already seen names (unless unprefixable).
           //
-          if (i != e && strcmp (i->name, pn) == 0 && !t[n])
+          string r;
+          small_vector<string, 1> ns;
+
+          auto append = [&r] (const char* v)
           {
-            string r (i->value);
-
-            // Add "back" the prefix.
+            // Separate values with a blank line.
             //
-            if (!p.empty ())
+            if (!r.empty ())
             {
-              auto sep = [] (char c) { return !alnum (c) && c != '_'; };
+              if (r.back () != '\n')
+                r += '\n';
 
-              size_t m (n.size () - p.size ()); // Prefix-less name length.
+              r += '\n';
+            }
 
-              for (size_t i (0); (i = r.find (pn, i)) != string::npos; i += m)
+            r += v;
+          };
+
+          auto prefix = [&p, &ns, &r, b = size_t (0)] () mutable
+          {
+            auto sep = [] (char c) { return !alnum (c) && c != '_'; };
+
+            for (const string& n: ns)
+            {
+              size_t m (n.size ()); // Prefix-less name length.
+
+              for (size_t i (b); (i = r.find (n, i)) != string::npos; i += m)
               {
                 if ((i     == 0         || sep (r[i - 1])) &&
                     (i + m == r.size () || sep (r[i + m])))
@@ -511,8 +575,108 @@ namespace build2
               }
             }
 
-            return r;
+            b = r.size ();
+          };
+
+          // Base checks.
+          //
+          // @@ TODO: detect cycles (currently we just prune, like an
+          //          include guard).
+          //
+          // @@ TODO: add special mode (autoconf.test=true) that verifies
+          //          on module load that all the bases are resolvable.
+          //          Then add a test that triggers it (ideally we would
+          //          want this at build-time, but that won't be easy in
+          //          Buildscript).
+          //
+          auto base = [this,
+                       &l, &t, a, &null,
+                       &md, &p, &ns,
+                       &find, &append, &prefix] (const string& n,
+                                                 const char* bs,
+                                                 const auto& base) -> void
+          {
+            auto df = make_diag_frame (
+              [&n] (const diag_record& dr)
+              {
+                dr << info << "while resolving base options for " << n;
+              });
+
+            for (size_t b (0), e (0); next_word (bs, b, e); )
+            {
+              string pn (bs, b, e - b); // Prefixless name.
+
+              // First supress duplicates.
+              //
+              {
+                auto i (md.checks.find (pn));
+                if (i != md.checks.end ())
+                {
+                  append (("/* Base " +
+                           i->second +
+                           " already defined. */").c_str ());
+
+                  if (pn != i->second)
+                    ns.push_back (move (pn));
+
+                  continue;
+                }
+              }
+
+              const check* c (find (pn.c_str ()));
+
+              // While it may be overridden by the user, we should also have
+              // the entry in the built-in catalog (where we get the
+              // unprefixable flag).
+              //
+              if (c == nullptr)
+                fail (l) << "unknown base option " << pn;
+
+              // Derive the prefixed name.
+              //
+              bool up (strchr (c->modifier, '!') != nullptr);
+
+              string n ((up ? string () : p) + pn);
+
+              md.checks.emplace (pn, n);
+
+              if (t[n])
+                append (
+                  this->in::rule::lookup (l, a, t, n, nullopt, null).c_str ());
+              else
+              {
+                if (*c->base != '\0')
+                  base (n, c->base, base);
+
+                append (c->value);
+              }
+
+              if (!p.empty ())
+              {
+                if (!up)
+                  ns.push_back (move (pn));
+
+                prefix ();
+              }
+            }
+          };
+
+          if (*c->base != '\0')
+            base (n, c->base, base);
+
+          // Main check.
+          //
+          append (c->value);
+
+          if (!p.empty ())
+          {
+            if (pn != nullptr) // Not unprefixable.
+              ns.push_back (pn);
+
+            prefix ();
           }
+
+          return r;
         }
       }
 

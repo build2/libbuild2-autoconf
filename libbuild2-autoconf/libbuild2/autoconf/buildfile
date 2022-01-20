@@ -8,7 +8,7 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
                       $impl_libs $intf_libs
 
 # - File name must be the exact variable name plus .h (used for sorting).
-# - First line in the file should be `// <NAME>`.
+# - First line in the file should be `// <NAME> [<MODIFIER>] [:<BASE>...]`.
 # - No double-quote or backslash escaping except for line continuations.
 #
 # NOTE: remember to update README.md if changing anything here.
@@ -28,11 +28,11 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
   h = $path($>[0])
   s = $path($>[1])
 
-  # We regularize the output with a dummy start entry plus add two end dummies
-  # that are used in tests.
+  # We regularize the output with a dummy start entry plus add five end
+  # dummies that are used in tests.
   #
   n = $size($<)
-  n += 3
+  n += 6
 
   cat <<"EOI" >$h
   namespace build2
@@ -42,6 +42,8 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
       struct check
       {
         const char* name;
+        const char* modifier; // ! or empty
+        const char* base;     // base names or empty
         const char* value;
       };
 
@@ -55,13 +57,13 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
 
   const build2::autoconf::check build2::autoconf::checks[$n] = {
   {
-  \"\",
+  \"\", \"\", \"\",
 
   \"\"
   EOI
 
   cat $i | sed -n \
-    -e 's|^// ([^ ]+) *$|},\n\n{\n"\1",\n|p' \
+    -e 's|^// ([^ !:]+) *(!)? *(: *(( *[^ ]+)+))? *$|},\n\n{\n"\1", "\2", "\4",\n|p' \
     -e 's|^(.*)\\$|"\1\\\\\\n"|p' \
     -e 's|^(.*)$|"\1\\n"|p' \
     - >>$s
@@ -70,15 +72,37 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
   },
 
   {
-  "zzz_TEST_DUMMY1_H",
+  "zzz_TEST_DUMMY1_H", "", "",
 
-  "#define zzz_TEST_DUMMY1_H 1"
+  "#define zzz_TEST_DUMMY1_H 1\n"
   },
 
   {
-  "zzz_TEST_DUMMY2_H",
+  "zzz_TEST_DUMMY2_H", "", "",
 
-  "#define zzz_TEST_DUMMY2_H 1"
+  "#define zzz_TEST_DUMMY2_H 1\n"
+  },
+
+  {
+  "zzz_TEST_DUMMY3_H", "!", "",
+
+  "#define zzz_TEST_DUMMY3_H 1\n"
+  },
+
+  {
+  "zzz_TEST_DUMMY4_H", "", "zzz_TEST_DUMMY1_H zzz_TEST_DUMMY3_H",
+
+  "#ifdef zzz_TEST_DUMMY1_H\n"
+  "#  define zzz_TEST_DUMMY4_H zzz_TEST_DUMMY3_H\n"
+  "#endif /*zzz_TEST_DUMMY1_H*/\n"
+  },
+
+  {
+  "zzz_TEST_DUMMY5_H", "", "zzz_TEST_DUMMY3_H zzz_TEST_DUMMY4_H",
+
+  "#ifdef zzz_TEST_DUMMY3_H\n"
+  "#  define zzz_TEST_DUMMY5_H zzz_TEST_DUMMY4_H\n"
+  "#endif /*zzz_TEST_DUMMY3_H*/\n"
   }
   };
   EOI
