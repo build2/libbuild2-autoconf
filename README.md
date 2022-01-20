@@ -15,7 +15,9 @@ expected values based on the platform/compiler macro checks (see note at the
 beginning of [Project Configuration][proj-config] for rationale).
 
 See [`libbuild2/autoconf/checks/`][checks] for the list of available build-in
-checks.
+checks. Submit requests for new checks as issues. Submit implementations of
+new checks (or any other improvements) as PRs or patches.
+
 
 ## Using in your projects
 
@@ -120,8 +122,9 @@ h{config}: in{config}
 ## Adding new checks
 
 To add a check for a new configuration option `<NAME>` simply create the
-`<NAME>.h` header file with the corresponding check and place it into
-[`libbuild2/autoconf/checks/`][checks] (use existing checks for inspiration).
+`<NAME>.h` header file (preserving the case) with the corresponding check and
+place it into [`libbuild2/autoconf/checks/`][checks] (use existing checks for
+inspiration).
 
 The first line in this header file must be in the form:
 
@@ -133,7 +136,8 @@ Subsequent lines should be C-style comments or preprocessor directives that
 `#define` or `#undef` `<NAME>` depending on whether the feature is available
 (though there can be idiosyncrasies; see `const.h`, for example). Note that
 there should be no double-quotes or backslashes except for line
-continuations. For example:
+continuations. For example, to add a check for option `HAVE_BAR`, we could
+create the `HAVE_BAR.h` header file with the following content:
 
 ```
 // HAVE_BAR

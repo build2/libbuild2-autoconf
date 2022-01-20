@@ -38,7 +38,10 @@ cat <<EOI >=config.h.in;
   #undef ZERO
   #undef VALUE
 
-    #  undef  TRUE
+  #undef TRUE
+  #undef FALSE
+
+    #  undef  MAYBE
 
   #undef CUSTOM_LINE
   #undef CUSTOM_BLOCK
@@ -54,6 +57,7 @@ $* <<EOI &config.h &config.h.d;
     ONE   = 1
     ZERO  = [uint64] 000
     VALUE = [uint64] 0123
+    MAYBE = true
 
     CUSTOM_LINE = '#define CUSTOM 123'
     CUSTOM_BLOCK = \
@@ -76,7 +80,10 @@ cat config.h >>EOO
   #undef ZERO
   #define VALUE 123
 
-  #define TRUE 1
+  /* TRUE already defined. */
+  /* FALSE already defined. */
+
+  #define MAYBE 1
 
   #define CUSTOM 123
   /* Make sure we do not redefine CUSTOM. */
@@ -101,15 +108,22 @@ cat <<EOI >=config.h.cmake;
   #cmakedefine ZERO
   #cmakedefine VALUE
 
-    #  cmakedefine  TRUE
+  #cmakedefine TRUE
+  #cmakedefine FALSE
+
+    #  cmakedefine  MAYBE
 
   #cmakedefine CUSTOM_LINE
   #cmakedefine CUSTOM_BLOCK
-  #cmakedefine CUSTOM_BLOCK @version@
+  #cmakedefine CUSTOM_BLOCK1 @version@
 
-  #cmakedefine TRUE  true
-  #cmakedefine FALSE false
-  #cmakedefine VALUE @VALUE@ /* @version@ */
+  #cmakedefine TRUE1  true
+  #cmakedefine FALSE1 false
+  #cmakedefine VALUE1 @VALUE1@ /* @version@ */
+
+  #cmakedefine TRUE1  true
+  #cmakedefine FALSE1 false
+  #cmakedefine VALUE1 @VALUE1@ /* @version@ */
 
   #cmakedefine zzz_TEST_DUMMY1_H @zzz_TEST_DUMMY1_H@
   #cmakedefine zzz_TEST_DUMMY2_H
@@ -122,6 +136,7 @@ $* <<EOI &config.h &config.h.d;
     ONE   = 1
     ZERO  = [uint64] 000
     VALUE = [uint64] 0123
+    MAYBE = true
 
     CUSTOM_LINE = '#define CUSTOM 123'
     CUSTOM_BLOCK = \
@@ -131,6 +146,18 @@ $* <<EOI &config.h &config.h.d;
   #  define CUSTOM 123
   #endif
   '
+
+    CUSTOM_BLOCK1 = \
+  '
+  /* Make sure we do not redefine CUSTOM1. */
+  #ifndef CUSTOM1
+  #  define CUSTOM1 123
+  #endif
+  '
+
+    TRUE1  = true
+    FALSE1 = [bool] false
+    VALUE1 = [uint64] 0123
 
     zzz_TEST_DUMMY2_H = '#define zzz_TEST_DUMMY2_H 2'
   }
@@ -144,21 +171,28 @@ cat config.h >>EOO
   #undef ZERO
   #define VALUE 123
 
-  #define TRUE 1
+  /* TRUE already defined. */
+  /* FALSE already defined. */
+
+  #define MAYBE 1
 
   #define CUSTOM 123
   /* Make sure we do not redefine CUSTOM. */
   #ifndef CUSTOM
   #  define CUSTOM 123
   #endif
-  /* Make sure we do not redefine CUSTOM. */
-  #ifndef CUSTOM
-  #  define CUSTOM 123
+  /* Make sure we do not redefine CUSTOM1. */
+  #ifndef CUSTOM1
+  #  define CUSTOM1 123
   #endif
 
-  #define TRUE true
-  #undef FALSE
-  #define VALUE 123 /* 1.2.3 */
+  #define TRUE1 true
+  #undef FALSE1
+  #define VALUE1 123 /* 1.2.3 */
+
+  /* TRUE1 already defined. */
+  /* FALSE1 already defined. */
+  /* VALUE1 already defined. */
 
   #define zzz_TEST_DUMMY1_H 1
   #define zzz_TEST_DUMMY2_H 2
@@ -177,7 +211,10 @@ cat <<EOI >=config.h.in;
   #mesondefine ZERO
   #mesondefine VALUE
 
-    #  mesondefine  TRUE
+  #mesondefine TRUE
+  #mesondefine FALSE
+
+    #  mesondefine  MAYBE
 
   #mesondefine CUSTOM_LINE
   #mesondefine CUSTOM_BLOCK
@@ -195,6 +232,7 @@ $* <<EOI &config.h &config.h.d;
     ONE   = 1
     ZERO  = [uint64] 000
     VALUE = [uint64] 0123
+    MAYBE = true
 
     CUSTOM_LINE = '#define CUSTOM 123'
     CUSTOM_BLOCK = \
@@ -217,7 +255,10 @@ cat config.h >>EOO
   #undef ZERO
   #define VALUE 123
 
-  #define TRUE 1
+  /* TRUE already defined. */
+  /* FALSE already defined. */
+
+  #define MAYBE 1
 
   #define CUSTOM 123
   /* Make sure we do not redefine CUSTOM. */
@@ -236,6 +277,7 @@ ln -s ../../bootstrap.build ../../root.build build/;
 cat <<EOI >=config.h.in;
   #undef PREFIX_zzz_TEST_DUMMY1_H
   #undef PREFIX_zzz_TEST_DUMMY2_H
+  #undef zzz_TEST_DUMMY3_H
   EOI
 $* <<EOI &config.h &config.h.d;
   ./: h{config}: in{config}
@@ -248,4 +290,114 @@ $* <<EOI &config.h &config.h.d;
 cat config.h >>EOO
   #define PREFIX_zzz_TEST_DUMMY1_H 1
   #define PREFIX_zzz_TEST_DUMMY2_H 2
+  #define zzz_TEST_DUMMY3_H 1
+  EOO
+
+: base
+:
+mkdir build;
+ln -s ../../bootstrap.build ../../root.build build/;
+cat <<EOI >=config.h.in;
+  #undef PREFIX_zzz_TEST_DUMMY4_H
+  EOI
+$* <<EOI &config.h &config.h.d;
+  ./: h{config}: in{config}
+  {
+    autoconf.prefix = PREFIX_
+  }
+  EOI
+cat config.h >>EOO
+  #define PREFIX_zzz_TEST_DUMMY1_H 1
+
+  #define zzz_TEST_DUMMY3_H 1
+
+  #ifdef PREFIX_zzz_TEST_DUMMY1_H
+  #  define PREFIX_zzz_TEST_DUMMY4_H zzz_TEST_DUMMY3_H
+  #endif /*PREFIX_zzz_TEST_DUMMY1_H*/
+  EOO
+
+: base-duplicate
+:
+mkdir build;
+ln -s ../../bootstrap.build ../../root.build build/;
+cat <<EOI >=config.h.in;
+  #undef PREFIX_zzz_TEST_DUMMY1_H
+
+  #undef zzz_TEST_DUMMY3_H
+
+  #undef PREFIX_zzz_TEST_DUMMY4_H
+  EOI
+$* <<EOI &config.h &config.h.d;
+  ./: h{config}: in{config}
+  {
+    autoconf.prefix = PREFIX_
+  }
+  EOI
+cat config.h >>EOO
+  #define PREFIX_zzz_TEST_DUMMY1_H 1
+
+  #define zzz_TEST_DUMMY3_H 1
+
+  /* Base PREFIX_zzz_TEST_DUMMY1_H already defined. */
+
+  /* Base zzz_TEST_DUMMY3_H already defined. */
+
+  #ifdef PREFIX_zzz_TEST_DUMMY1_H
+  #  define PREFIX_zzz_TEST_DUMMY4_H zzz_TEST_DUMMY3_H
+  #endif /*PREFIX_zzz_TEST_DUMMY1_H*/
+  EOO
+
+: base-custom
+:
+mkdir build;
+ln -s ../../bootstrap.build ../../root.build build/;
+cat <<EOI >=config.h.in;
+  #undef PREFIX_zzz_TEST_DUMMY4_H
+  EOI
+$* <<EOI &config.h &config.h.d;
+  ./: h{config}: in{config}
+  {
+    autoconf.prefix = PREFIX_
+
+    PREFIX_zzz_TEST_DUMMY1_H = '#define PREFIX_zzz_TEST_DUMMY1_H 10'
+    zzz_TEST_DUMMY3_H = '#define zzz_TEST_DUMMY3_H 30'
+  }
+  EOI
+cat config.h >>EOO
+  #define PREFIX_zzz_TEST_DUMMY1_H 10
+
+  #define zzz_TEST_DUMMY3_H 30
+
+  #ifdef PREFIX_zzz_TEST_DUMMY1_H
+  #  define PREFIX_zzz_TEST_DUMMY4_H zzz_TEST_DUMMY3_H
+  #endif /*PREFIX_zzz_TEST_DUMMY1_H*/
+  EOO
+
+: base-recursive
+:
+mkdir build;
+ln -s ../../bootstrap.build ../../root.build build/;
+cat <<EOI >=config.h.in;
+  #undef PREFIX_zzz_TEST_DUMMY5_H
+  EOI
+$* <<EOI &config.h &config.h.d;
+  ./: h{config}: in{config}
+  {
+    autoconf.prefix = PREFIX_
+  }
+  EOI
+cat config.h >>EOO
+  #define zzz_TEST_DUMMY3_H 1
+
+  #define PREFIX_zzz_TEST_DUMMY1_H 1
+
+  /* Base zzz_TEST_DUMMY3_H already defined. */
+
+  #ifdef PREFIX_zzz_TEST_DUMMY1_H
+  #  define PREFIX_zzz_TEST_DUMMY4_H zzz_TEST_DUMMY3_H
+  #endif /*PREFIX_zzz_TEST_DUMMY1_H*/
+
+  #ifdef zzz_TEST_DUMMY3_H
+  #  define PREFIX_zzz_TEST_DUMMY5_H PREFIX_zzz_TEST_DUMMY4_H
+  #endif /*zzz_TEST_DUMMY3_H*/
   EOO
