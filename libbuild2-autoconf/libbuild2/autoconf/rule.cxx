@@ -641,7 +641,8 @@ namespace build2
               md.checks.emplace (pn, n);
 
               if (t[n])
-                append (in::rule::lookup (l, a, t, n, nullopt, null).c_str ());
+                append (
+                  this->in::rule::lookup (l, a, t, n, nullopt, null).c_str ());
               else
               {
                 if (*c->base != '\0')
