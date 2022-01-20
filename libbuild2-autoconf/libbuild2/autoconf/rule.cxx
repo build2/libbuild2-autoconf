@@ -111,6 +111,15 @@ namespace build2
     }
 
     void rule::
+    perform_update_pre (action, const target& t, ofdstream&, const char*) const
+    {
+      // Clear the checks set which may have already been partially populated
+      // during depdb verification.
+      //
+      t.data<match_data> ().checks.clear ();
+    }
+
+    void rule::
     process (const location& l,
              action a, const target& t,
              depdb& dd, size_t& dd_skip,

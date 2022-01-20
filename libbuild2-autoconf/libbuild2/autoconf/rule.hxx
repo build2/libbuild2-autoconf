@@ -28,6 +28,10 @@ namespace build2
       perform_update_depdb (action, const target&, depdb&) const override;
 
       virtual void
+      perform_update_pre (action, const target&,
+                          ofdstream&, const char*) const override;
+
+      virtual void
       process (const location&,
                action, const target&,
                depdb&, size_t&,
