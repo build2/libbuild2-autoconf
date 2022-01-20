@@ -139,7 +139,7 @@ The first line in this header file must be in the form:
 ```
 
 If the name is followed by the `!` modifier, then it is *unprefixable* (see
-the previous section for detail). The name can also be followed by `:` and a
+the previous section for details). The name can also be followed by `:` and a
 list of base checks. Such checks are automatically inserted before the rest of
 the lines in the resulting substitution.
 

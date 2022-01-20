@@ -7,6 +7,10 @@ using autoconf
 
 using c
 
-# @@ Should we be able to do just test = $build.path?
+# Every exe{} in this subproject is by default a test.
 #
-testscript{*}: test = $recall($build.path)
+exe{*}: test = true
+
+# Specify the test target for cross-testing.
+#
+test.target = $c.target
