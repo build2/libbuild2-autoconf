@@ -1,0 +1,9 @@
+// HAVE_POLLTS : LIBC_VERSION
+
+#undef HAVE_POLLTS
+
+/* Since NetBSD 3.0.
+ */
+#if BUILD2_AUTOCONF_NETBSD_PREREQ(3, 0)
+#  define HAVE_POLLTS 1
+#endif

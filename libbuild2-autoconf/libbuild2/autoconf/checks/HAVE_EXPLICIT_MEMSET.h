@@ -1,9 +1,9 @@
-// HAVE_EXPLICIT_MEMSET
+// HAVE_EXPLICIT_MEMSET : LIBC_VERSION
 
 #undef HAVE_EXPLICIT_MEMSET
 
 /* Since NetBSD 7.0.0.
  */
-#if defined(__NetBSD_Version__) && __NetBSD_Version__ >= 700000000
+#if BUILD2_AUTOCONF_NETBSD_PREREQ(7, 0)
 #  define HAVE_EXPLICIT_MEMSET 1
 #endif

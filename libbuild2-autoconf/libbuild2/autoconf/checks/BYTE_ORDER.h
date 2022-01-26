@@ -43,8 +43,8 @@
 #    define BIG_ENDIAN    4321
 #    define LITTLE_ENDIAN 1234
 #    define BYTE_ORDER    LITTLE_ENDIAN
-#  elif defined(__BYTE_ORDER__) &&              \
-        defined(__ORDER_BIG_ENDIAN__) &&        \
+#  elif defined(__BYTE_ORDER__) &&       \
+        defined(__ORDER_BIG_ENDIAN__) && \
         defined(__ORDER_LITTLE_ENDIAN__)
      /* GCC, Clang (and others, potentially).
       */

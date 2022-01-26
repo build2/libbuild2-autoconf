@@ -141,7 +141,9 @@ The first line in this header file must be in the form:
 If the name is followed by the `!` modifier, then it is *unprefixable* (see
 the previous section for details). The name can also be followed by `:` and a
 list of base checks. Such checks are automatically inserted before the rest of
-the lines in the resulting substitution.
+the lines in the resulting substitution. One notable check that you may
+want to use as a base is [`LIBC_VERSION`][libc-version] (see comments for
+details).
 
 Subsequent lines should be C-style comments or preprocessor directives that
 `#define` or `#undef` `<NAME>` depending on whether the feature is available
@@ -178,3 +180,4 @@ ways that deal with duplication (for example, include guards).
 [module-in]: https://build2.org/build2/doc/build2-build-system-manual.xhtml#module-in
 [proj-config]: https://build2.org/build2/doc/build2-build-system-manual.xhtml#proj-config
 [checks]: https://github.com/build2/libbuild2-autoconf/tree/master/libbuild2-autoconf/libbuild2/autoconf/checks/
+[libc-version]: https://github.com/build2/libbuild2-autoconf/tree/master/libbuild2-autoconf/libbuild2/autoconf/checks/LIBC_VERSION.h

@@ -1,0 +1,14 @@
+// HAVE_CLOCK_GETTIME : LIBC_VERSION
+
+#undef HAVE_CLOCK_GETTIME
+
+/* Since Linux 2.6/glibc 2.2 (based on glibc commit history), FreeBSD 3.0,
+ * OpenBSD 2.1, NetBSD 1.4, and Mac OSX 10.12.
+ */
+#if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 2)     || \
+    BUILD2_AUTOCONF_FREEBSD_PREREQ(3, 0)   || \
+    BUILD2_AUTOCONF_OPENBSD_PREREQ(199706) || \
+    BUILD2_AUTOCONF_NETBSD_PREREQ(1, 4)    || \
+    BUILD2_AUTOCONF_MACOS_PREREQ(10, 12)
+#  define HAVE_CLOCK_GETTIME 1
+#endif
