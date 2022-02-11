@@ -82,8 +82,13 @@
  */
 #if defined(__linux__)
 #  include <features.h> /* __GLIBC__, __GLIBC_MINOR__, __GLIBC_PREREQ() */
-#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
-#  include <sys/param.h> /* __FreeBSD_version, OpenBSD, __NetBSD_Version__ */
+#elif defined(__FreeBSD__)
+#  include <osreldate.h> /* __FreeBSD_version */
+#elif defined(__OpenBSD__) || defined(__NetBSD__)
+/* Note: sys/param.h defines macros with common names such as ALIGN which may
+ * clash with user code (see Qt).
+ */
+#  include <sys/param.h> /* OpenBSD, __NetBSD_Version__ */
 #elif defined(__APPLE__)
 #  include <Availability.h> /* __MAC_OS_X_VERSION_MIN_REQUIRED */
 #endif
