@@ -21,9 +21,10 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
 {{
   diag gen ($>[1])
 
-  # We have to sort without the extension.
+  # We have to sort without the extension and as strings (to sort
+  # case-sensitively on Windows).
   #
-  i = $regex.apply($sort($base($path($<))), '(.+)', '\1.h')
+  i = $regex.apply($sort([strings] $base($path($<))), '(.+)', '\1.h')
 
   h = $path($>[0])
   s = $path($>[1])
