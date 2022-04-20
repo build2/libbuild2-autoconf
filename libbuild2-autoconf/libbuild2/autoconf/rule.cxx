@@ -19,11 +19,25 @@ namespace build2
   {
     enum class flavor {autoconf, cmake, meson};
 
+    // Wrap the in::rule's perform_update recipe into a data-carrying recipe.
+    //
+    // To optimize this a bit further we will call in::rule::perform_update()
+    // directly (after all it's virtual and thus part of the in_rule's
+    // interface).
+    //
     struct match_data
     {
       autoconf::flavor    flavor;
       string              prefix;
       map<string, string> checks; // Checks already seen.
+
+      const autoconf::rule& rule;
+
+      target_state
+      operator() (action a, const target& t)
+      {
+        return rule.perform_update (a, t);
+      }
     };
 
     rule::
@@ -33,8 +47,6 @@ namespace build2
                     '@'   /* symbol */,
                     false /* strict */)
     {
-      static_assert (sizeof (match_data) <= target::data_size,
-                     "insufficient space");
     }
 
     recipe rule::
@@ -42,54 +54,57 @@ namespace build2
     {
       recipe r (in::rule::apply (a, t));
 
-      // Determine and cache the configuration file flavor.
-      //
-      flavor f (flavor::autoconf);
-
-      if (const string* s = cast_null<string> (t["autoconf.flavor"]))
+      if (a == perform_update_id)
       {
-        if      (*s == "cmake") f = flavor::cmake;
-        else if (*s == "meson") f = flavor::meson;
-        else if (*s != "autoconf")
-          fail << "invalid configuration file flavor '" << *s << "'";
-      }
-      else
-      {
-        // If the in{} file extension is either .cmake or .meson, then
-        // use that as the flavor.
+        // Determine and cache the configuration file flavor.
         //
-        for (const target* pt: t.prerequisite_targets[a])
+        flavor f (flavor::autoconf);
+
+        if (const string* s = cast_null<string> (t["autoconf.flavor"]))
         {
-          if (pt != nullptr)
+          if      (*s == "cmake") f = flavor::cmake;
+          else if (*s == "meson") f = flavor::meson;
+          else if (*s != "autoconf")
+            fail << "invalid configuration file flavor '" << *s << "'";
+        }
+        else
+        {
+          // If the in{} file extension is either .cmake or .meson, then
+          // use that as the flavor.
+          //
+          for (const target* pt: t.prerequisite_targets[a])
           {
-            if (const auto* it = pt->is_a<in::in> ())
+            if (pt != nullptr)
             {
-              string e (it->path ().extension ());
+              if (const auto* it = pt->is_a<in::in> ())
+              {
+                string e (it->path ().extension ());
 
-              if      (e == "cmake") f = flavor::cmake;
-              else if (e == "meson") f = flavor::meson;
+                if      (e == "cmake") f = flavor::cmake;
+                else if (e == "meson") f = flavor::meson;
 
-              break;
+                break;
+              }
             }
           }
         }
+
+        // Get the prefix if any.
+        //
+        string p (cast_empty<string> (t["autoconf.prefix"]));
+
+        return match_data {f, move (p), {}, *this};
       }
-
-      // Get the prefix if any.
-      //
-      string p (cast_empty<string> (t["autoconf.prefix"]));
-
-      t.data (match_data {f, move (p), {}});
 
       return r;
     }
 
     void rule::
-    perform_update_depdb (action, const target& t, depdb& dd) const
+    perform_update_depdb (action a, const target& t, depdb& dd) const
     {
       tracer trace ("autoconf::rule::perform_update_depdb");
 
-      const match_data& md (t.data<match_data> ());
+      const match_data& md (t.data<match_data> (a));
 
       // Then the flavor.
       //
@@ -111,12 +126,14 @@ namespace build2
     }
 
     void rule::
-    perform_update_pre (action, const target& t, ofdstream&, const char*) const
+    perform_update_pre (action a, const target& t,
+                        ofdstream&,
+                        const char*) const
     {
       // Clear the checks set which may have already been partially populated
       // during depdb verification.
       //
-      t.data<match_data> ().checks.clear ();
+      t.data<match_data> (a).checks.clear ();
     }
 
     void rule::
@@ -153,7 +170,7 @@ namespace build2
 
       size_t i (b);
 
-      flavor f (t.data<match_data> ().flavor);
+      flavor f (t.data<match_data> (a).flavor);
 
       // Substitute special #undef/#cmakedfine/#mesondefine line. If value is
       // false, then do not append the value to #define.
@@ -467,7 +484,7 @@ namespace build2
       {
         assert (*flags == 1);
 
-        match_data& md (t.data<match_data> ());
+        match_data& md (t.data<match_data> (a));
 
         // If this is a special substitution, then look in our catalog of
         // built-in checks. Specifically, the plan is as follows:
