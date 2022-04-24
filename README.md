@@ -235,9 +235,10 @@ substitution because it was already inserted as part of the
 preprocessed on Windows.
 
 While there is no bulletproof way to detect such situations (because the
-unconditional check could be `BUILD2_AUTOCONF_LIBC_VERSION` itself), it is a
-good idea for checks that are based on other checks to verify that the base
-macros are in fact defined, for example:
+unconditional check could be `BUILD2_AUTOCONF_LIBC_VERSION` itself; perhaps
+we should only have private bases that are only accessed by the user via
+derived public checks), it is a good idea for checks that are based on
+other checks to verify that the base macros are in fact defined, for example:
 
 ```
 // HAVE_EXPLICIT_BZERO : BUILD2_AUTOCONF_LIBC_VERSION
