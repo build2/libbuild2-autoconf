@@ -1,5 +1,9 @@
 // HAVE_EXPLICIT_MEMSET : BUILD2_AUTOCONF_LIBC_VERSION
 
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
 #undef HAVE_EXPLICIT_MEMSET
 
 /* Since NetBSD 7.0.0.

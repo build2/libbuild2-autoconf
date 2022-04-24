@@ -1,5 +1,9 @@
 // HAVE_DLOPEN : BUILD2_AUTOCONF_LIBC_VERSION
 
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
 #undef HAVE_DLOPEN
 
 /* Since Linux/glibc 2.0 and all versions of other supported UNIXes.

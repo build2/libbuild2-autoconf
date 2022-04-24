@@ -1,5 +1,9 @@
 // HAVE_FUTIMES : BUILD2_AUTOCONF_LIBC_VERSION
 
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
 #undef HAVE_FUTIMES
 
 /* Since Linux/glibc 2.3, FreeBSD 3.x, OpenBSD 1.2 (but the `OpenBSD` macro

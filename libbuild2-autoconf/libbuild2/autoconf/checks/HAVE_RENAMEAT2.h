@@ -1,5 +1,9 @@
 // HAVE_RENAMEAT2 : BUILD2_AUTOCONF_LIBC_VERSION
 
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
 #undef HAVE_RENAMEAT2
 
 // Since Linux 3.15/glibc 2.28.

@@ -85,6 +85,45 @@ h{config}: in{config}
 }
 ```
 
+Note that an implementation of a check may depend on another check. As a
+result, substitutions should not be conditional at the preprocessor level
+(unless all the checks are part of the same condition). Nor should the
+results of checks be adjusted until after the last check. For example:
+
+```
+#ifndef _WIN32
+#  cmakedefine HAVE_EXPLICIT_BZERO // Condition substitution.
+#endif
+
+#cmakedefine HAVE_EXPLICIT_MEMSET  // Shares implementation with BZERO.
+
+#cmakedefine BYTE_ORDER
+
+#if BYTE_ORDER == LITTLE_ENDIAN
+#  undef BYTE_ORDER               // Adjusting the result.
+#endif
+
+#cmakedefine WORDS_BIGENDIAN      // Based on BYTE_ORDER.
+```
+
+Below is the correct way to achieve the above semantics:
+
+```
+#cmakedefine HAVE_EXPLICIT_BZERO
+#cmakedefine HAVE_EXPLICIT_MEMSET
+
+#cmakedefine BYTE_ORDER
+#cmakedefine WORDS_BIGENDIAN
+
+#ifdef _WIN32
+#  undef HAVE_EXPLICIT_BZERO
+#endif
+
+#if BYTE_ORDER == LITTLE_ENDIAN
+#  undef BYTE_ORDER
+#endif
+```
+
 The built-in checks can be prefixed in order to avoid clashes with similarly
 named macros in other headers. This is an especially good idea if the
 resulting header is public. To enable this, we specify the prefix with
@@ -176,6 +215,39 @@ files are involved, then the user is expected to employ the `autoconf.prefix`
 functionality to avoid clashes across files. However, this does not help
 unprefixable names and, as a result, such checks should be implemented in
 ways that deal with duplication (for example, include guards).
+
+The duplicate suppression is incompatible with conditional (at the
+preprocessor level) checks, for example, assuming both `HAVE_EXPLICIT_*`
+checks are based on `BUILD2_AUTOCONF_LIBC_VERSION`:
+
+```
+#ifndef _WIN32
+#  undef HAVE_EXPLICIT_BZERO
+#endif
+
+#undef HAVE_EXPLICIT_MEMSET
+```
+
+In this example, the `autoconf` module will omit the second copy of the
+`BUILD2_AUTOCONF_LIBC_VERSION` check as part of the `HAVE_EXPLICIT_MEMSET`
+substitution because it was already inserted as part of the
+`HAVE_EXPLICIT_BZERO` substitution. But the first copy will not be
+preprocessed on Windows.
+
+While there is no bulletproof way to detect such situations (because the
+unconditional check could be `BUILD2_AUTOCONF_LIBC_VERSION` itself), it is a
+good idea for checks that are based on other checks to verify that the base
+macros are in fact defined, for example:
+
+```
+// HAVE_EXPLICIT_BZERO : BUILD2_AUTOCONF_LIBC_VERSION
+
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
+...
+```
 
 [module-in]: https://build2.org/build2/doc/build2-build-system-manual.xhtml#module-in
 [proj-config]: https://build2.org/build2/doc/build2-build-system-manual.xhtml#proj-config

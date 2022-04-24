@@ -1,5 +1,9 @@
 // HAVE_POLL : BUILD2_AUTOCONF_LIBC_VERSION
 
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
 #undef HAVE_POLL
 
 /* Since Linux 2.1.23/glibc (all versions; emulated using select() on older

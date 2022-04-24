@@ -1,5 +1,9 @@
 // HAVE_FUTIMENS : BUILD2_AUTOCONF_LIBC_VERSION
 
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
 #undef HAVE_FUTIMENS
 
 /* Since Linux/glibc 2.6, FreeBSD 10.3, OpenBSD 5.0, NetBSD 6.0, Mac OS 10.6

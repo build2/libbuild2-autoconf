@@ -1,5 +1,9 @@
 // HAVE_EVENTFD : BUILD2_AUTOCONF_LIBC_VERSION
 
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
 #undef HAVE_EVENTFD
 
 /* Since Linux/glibc 2.8, FreeBSD 13.

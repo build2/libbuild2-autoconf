@@ -1,5 +1,9 @@
 // HAVE_PPOLL : BUILD2_AUTOCONF_LIBC_VERSION
 
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
 #undef HAVE_PPOLL
 
 /* Since Linux 2.6.16/glibc 2.4, FreeBSD 11, OpenBSD 5.4.

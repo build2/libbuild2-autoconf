@@ -1,5 +1,9 @@
 // HAVE_CLOCK_GETTIME : BUILD2_AUTOCONF_LIBC_VERSION
 
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
 #undef HAVE_CLOCK_GETTIME
 
 /* Since Linux 2.6/glibc 2.2 (based on glibc commit history), FreeBSD 3.0,

@@ -1,5 +1,9 @@
 // HAVE_POSIX_FALLOCATE : BUILD2_AUTOCONF_LIBC_VERSION
 
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
 #undef HAVE_POSIX_FALLOCATE
 
 /* Since Linux/glibc 2.2, FreeBSD 9.0

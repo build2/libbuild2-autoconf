@@ -1,5 +1,9 @@
 // HAVE_EXPLICIT_BZERO : BUILD2_AUTOCONF_LIBC_VERSION
 
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
 #undef HAVE_EXPLICIT_BZERO
 
 /* Since FreeBSD 11, OpenBSD 5.5, and glibc 2.25.

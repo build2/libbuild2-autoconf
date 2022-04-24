@@ -1,5 +1,9 @@
 // HAVE_LINKAT : BUILD2_AUTOCONF_LIBC_VERSION
 
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
 #undef HAVE_LINKAT
 
 /* Since Linux 2.6.16/glibc 2.4, FreeBSD 8.0, OpenBSD 5.0, NetBSD 7.0 (it was
