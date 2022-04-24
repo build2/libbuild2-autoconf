@@ -1,4 +1,7 @@
-// LIBC_VERSION!
+// BUILD2_AUTOCONF_LIBC_VERSION!
+
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#define BUILD2_AUTOCONF_LIBC_VERSION
 
 /* Include headers required to make various libc version number macros
  * available.
@@ -167,3 +170,5 @@
 #else
 #  define BUILD2_AUTOCONF_MACOS_PREREQ(maj, min) 0
 #endif
+
+#endif /* BUILD2_AUTOCONF_LIBC_VERSION */
