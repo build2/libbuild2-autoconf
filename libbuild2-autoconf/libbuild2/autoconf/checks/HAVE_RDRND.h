@@ -1,4 +1,4 @@
-// HAVE_RDRND : HAVE_AVX2
+// HAVE_RDRND
 
 #undef HAVE_RDRND
 
@@ -16,6 +16,6 @@
  *       Note that RDRND intrinsics were added to Visual C++ 2015 according to
  *       Wikipedia.
  */
-#if defined(__RDRND__) || (defined(_MSC_VER) && defined(HAVE_AVX2))
+#if defined(__RDRND__) || (defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_RDRND 1
 #endif
