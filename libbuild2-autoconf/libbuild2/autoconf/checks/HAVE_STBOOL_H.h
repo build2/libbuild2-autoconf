@@ -1,0 +1,5 @@
+// HAVE_STDBOOL_H
+
+#undef HAVE_STDBOOL_H
+
+#define HAVE_STDBOOL_H 1
