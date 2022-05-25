@@ -92,7 +92,7 @@ results of checks be adjusted until after the last check. For example:
 
 ```
 #ifndef _WIN32
-#  cmakedefine HAVE_EXPLICIT_BZERO // Condition substitution.
+#  cmakedefine HAVE_EXPLICIT_BZERO // Conditional substitution.
 #endif
 
 #cmakedefine HAVE_EXPLICIT_MEMSET  // Shares implementation with BZERO.
