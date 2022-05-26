@@ -14,6 +14,6 @@
     defined(__FreeBSD__)                || \
     defined(__OpenBSD__)                || \
     BUILD2_AUTOCONF_NETBSD_PREREQ(1, 3) || \
-    (defined(__APPLE__) && defined(__MACH__))
+    defined(BUILD2_AUTOCONF_MACOS)
 #  define HAVE_POLL 1
 #endif

@@ -16,6 +16,6 @@
 #if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 3)     || \
     BUILD2_AUTOCONF_FREEBSD_PREREQ(9, 1)   || \
     BUILD2_AUTOCONF_OPENBSD_PREREQ(201710) || \
-    defined(__APPLE__) && defined(__MACH__)
+    defined(BUILD2_AUTOCONF_MACOS)
 #  define HAVE_NEWLOCALE 1
 #endif

@@ -14,6 +14,6 @@
     BUILD2_AUTOCONF_FREEBSD_PREREQ(8, 0)   || \
     BUILD2_AUTOCONF_OPENBSD_PREREQ(201111) || \
     BUILD2_AUTOCONF_NETBSD_PREREQ(7, 0)    || \
-    (defined(__APPLE__) && defined(__MACH__))
+    defined(BUILD2_AUTOCONF_MACOS)
 #  define HAVE_LINKAT 1
 #endif

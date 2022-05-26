@@ -13,6 +13,6 @@
     BUILD2_AUTOCONF_FREEBSD_PREREQ(2, 0)   || \
     BUILD2_AUTOCONF_OPENBSD_PREREQ(199712) || \
     BUILD2_AUTOCONF_NETBSD_PREREQ(1, 3)    || \
-    defined(__APPLE__) && defined(__MACH__)
+    defined(BUILD2_AUTOCONF_MACOS)
 #  define HAVE_GETPAGESIZE 1
 #endif
