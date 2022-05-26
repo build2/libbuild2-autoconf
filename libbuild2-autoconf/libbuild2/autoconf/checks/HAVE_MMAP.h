@@ -6,6 +6,8 @@
 
 #undef HAVE_MMAP
 
+/* Note: see also HAVE_SYS_MMAN_H. */
+
 /* All versions of glibc, FreeBSD, OpenBSD, NetBSD, and Mac OS (from BSD).
  */
 #if defined(__GLIBC__)   || \

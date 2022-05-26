@@ -6,6 +6,8 @@
 
 #undef HAVE_NEWLOCALE
 
+/* Note: see also HAVE_USELOCALE. */
+
 /* Since glibc 2.3, FreeBSD 9.1, OpenBSD 6.2, and Mac OS X (hard to tell but
  * based on the manpages available online it looks like Tiger at the latest).
  *

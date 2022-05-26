@@ -1,15 +1,19 @@
-// HAVE_SYS_MMAN_H : HAVE_MMAP
+// HAVE_SYS_MMAN_H : BUILD2_AUTOCONF_LIBC_VERSION
 
-/* Note: see also HAVE_MMAP. */
-
-// @@ Let'd dulplicate (and other places, like locate)
-
-#ifndef HAVE_MMAP
-#  error HAVE_MMAP appears to be conditionally included
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
 #endif
 
 #undef HAVE_SYS_MMAN_H
 
-#ifdef HAVE_MMAP
+/* Note: see also HAVE_MMAP. */
+
+/* All versions of glibc, FreeBSD, OpenBSD, NetBSD, and Mac OS (from BSD).
+ */
+#if defined(__GLIBC__)   || \
+    defined(__FreeBSD__) || \
+    defined(__OpenBSD__) || \
+    defined(__NetBSD__)  || \
+    defined(BUILD2_AUTOCONF_MACOS)
 #  define HAVE_SYS_MMAN_H 1
 #endif
