@@ -31,9 +31,11 @@
  * #if defined(__FreeBSD__)
  * #if defined(__OpenBSD__)
  * #if defined(__NetBSD__)
- * #if defined(__APPLE__) && defined(__MACH__)
  *
- * Note that just __APPLE__ covers all the Apple platforms (MacOS, iOS, etc).
+ * Except for MacOS, which we detect using our own macro (for the sake of
+ * simplicity):
+ *
+ * #if defined(BUILD2_AUTOCONF_MACOS)
  *
  * Macros for detecting platforms and their versions:
  *
@@ -155,8 +157,16 @@
  *
  * Return 1 if the given version number is >= the Mac OS version, or 0
  * otherwise.
+ *
+ * BUILD2_AUTOCONF_MACOS
+ *
+ * Defined if the current platform is MacOS, or undefined otherwise.
  */
 #if defined(__APPLE__) && defined(__MACH__)
+/* Note that just __APPLE__ covers all the Apple platforms (MacOS, iOS, etc).
+ */
+#  define BUILD2_AUTOCONF_MACOS 1
+
 #  if !defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
 #    error __MAC_OS_X_VERSION_MIN_REQUIRED not defined
 #  endif
@@ -168,6 +178,8 @@
        (__MAC_OS_X_VERSION_MIN_REQUIRED >= (maj)*10000 + (min)*100)
 #  endif
 #else
+#  undef BUILD2_AUTOCONF_MACOS
+
 #  define BUILD2_AUTOCONF_MACOS_PREREQ(maj, min) 0
 #endif
 

@@ -12,6 +12,6 @@
     defined(__FreeBSD__)               || \
     defined(__OpenBSD__)               || \
     defined(__NetBSD__)                || \
-    (defined(__APPLE__) && defined(__MACH__))
+    defined(BUILD2_AUTOCONF_MACOS)
 #  define HAVE_DLOPEN 1
 #endif
