@@ -1,5 +1,9 @@
 // HAVE_SYS_MMAN_H : HAVE_MMAP
 
+/* Note: see also HAVE_MMAP. */
+
+// @@ Let'd dulplicate (and other places, like locate)
+
 #ifndef HAVE_MMAP
 #  error HAVE_MMAP appears to be conditionally included
 #endif

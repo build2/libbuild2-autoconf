@@ -13,7 +13,8 @@
     BUILD2_AUTOCONF_FREEBSD_PREREQ(1, 0)    || \
     BUILD2_AUTOCONF_OPENBSD_PREREQ(199712)  || \
     BUILD2_AUTOCONF_NETBSD_PREREQ(1, 3)     || \
-    defined(__APPLE__) && defined(__MACH__) || \
+    defined(__APPLE__) && defined(__MACH__) || \  //@@ (and other places)
+                                                  // Let's add BUILD2_AUTOCONF_MACOSX
     defined(_WIN32)
 #  define HAVE_ATEXIT 1
 #endif
