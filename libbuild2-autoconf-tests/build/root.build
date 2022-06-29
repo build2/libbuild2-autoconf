@@ -3,7 +3,8 @@
 # Also, our tests use this project as their amalgamation in order to get the
 # module import location (as well as the C module configuration).
 #
-using autoconf
+if ($build.mode != 'skeleton')
+  using autoconf
 
 using c
 
