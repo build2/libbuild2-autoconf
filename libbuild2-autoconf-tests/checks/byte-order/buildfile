@@ -8,16 +8,11 @@
 
 ./: exe{driver}: c{driver}
 
-./: h{config}: in{config}
+./: exe{driver-posix}: include = ($c.target.system != 'win32-msvc')
+
+exe{driver-posix}: obje{driver-posix}: c{driver}
 
 c.poptions += "-I$out_base"
+obje{driver-posix}: c.poptions += -D_POSIX_C_SOURCE
 
-if ($c.target.system != 'win32-msvc')
-{
-  ./: exe{driver-posix}: obje{driver-posix}
-
-  obje{driver-posix}: c{driver}
-  {
-    c.poptions += -D_POSIX_C_SOURCE
-  }
-}
+./: h{config}: in{config}
