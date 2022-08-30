@@ -5,7 +5,7 @@
 #endif
 
 #undef HAVE_SYS_IOCTL_H
-/* Since "Version 7 AT&T UNIX" (1979)
+/* Since Version 7 AT&T UNIX (1979)
  */
 #if defined(__linux__)   || \
     defined(__FreeBSD__) || \
