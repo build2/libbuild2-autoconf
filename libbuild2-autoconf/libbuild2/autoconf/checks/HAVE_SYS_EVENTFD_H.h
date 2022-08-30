@@ -1,0 +1,15 @@
+// HAVE_SYS_EVENTFD_H : BUILD2_AUTOCONF_LIBC_VERSION
+
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
+#undef HAVE_SYS_EVENTFD_H
+
+/* Since FreeBSD 13.0, NetBSD 10.0, glibc 2.8
+ */
+#if BUILD2_AUTOCONF_FREEBSD_PREREQ(13, 0)   || \
+    BUILD2_AUTOCONF_NETBSD_PREREQ(10, 0)    || \
+    BUILD2_AUTOCONF_GLIBC_PREREQ(2, 8)
+#  define HAVE_SYS_EVENTFD_H 1
+#endif
