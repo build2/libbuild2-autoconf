@@ -5,7 +5,7 @@
 #endif
 
 #undef HAVE_SYS_PARAM_H
-/* Since BSD (~1995)
+/* Since 4.4BSD (~1995)
  */
 #if defined(__linux__)   || \
     defined(__FreeBSD__) || \

@@ -5,7 +5,7 @@
 #endif
 
 #undef HAVE_SYSCTL
-/* Since BSD 4.4 (~1995)
+/* Since 4.4BSD (~1995)
  */
 #if defined(__FreeBSD__) || \
     defined(__OpenBSD__) || \

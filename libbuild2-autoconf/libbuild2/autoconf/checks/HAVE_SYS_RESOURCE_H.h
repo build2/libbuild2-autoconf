@@ -5,7 +5,7 @@
 #endif
 
 #undef HAVE_SYS_RESOURCE_H
-/* Since BSD (~1983)
+/* Since 4.2BSD (~1983)
  */
 #if defined(__linux__)   || \
     defined(__FreeBSD__) || \
