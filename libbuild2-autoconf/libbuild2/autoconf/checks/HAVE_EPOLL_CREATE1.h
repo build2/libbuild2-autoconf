@@ -1,0 +1,13 @@
+// HAVE_EPOLL_CREATE1 : BUILD2_AUTOCONF_LIBC_VERSION
+
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
+#undef HAVE_EPOLL_CREATE1
+
+/* Since glibc 2.9.
+ */
+#if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 9)
+#  define HAVE_EPOLL_CREATE1 1
+#endif
