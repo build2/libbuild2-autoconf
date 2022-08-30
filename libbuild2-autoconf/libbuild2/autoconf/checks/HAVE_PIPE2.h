@@ -1,0 +1,17 @@
+// HAVE_PIPE2 : BUILD2_AUTOCONF_LIBC_VERSION
+
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
+#undef HAVE_PIPE2
+
+/* Since OpenBSD 5.7, FreeBSD 10.0, NetBSD 6.0,
+ * glibc 2.9.
+ */
+#if BUILD2_AUTOCONF_OPENBSD_PREREQ(201505) || \
+    BUILD2_AUTOCONF_FREEBSD_PREREQ(10, 0)   || \
+    BUILD2_AUTOCONF_NETBSD_PREREQ(6, 0)    || \
+    BUILD2_AUTOCONF_GLIBC_PREREQ(2, 9)
+#  define HAVE_PIPE2 1
+#endif
