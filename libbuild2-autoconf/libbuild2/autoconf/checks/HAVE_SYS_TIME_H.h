@@ -7,7 +7,6 @@
 #undef HAVE_SYS_TIME_H
 
 /* Since 4.2BSD (OpenBSD, FreeBSD, Mac OS X), NetBSD 6.0
- * glibc 2.31.
  */
 #if defined(__linux__)                      || \
     defined(__FreeBSD__)                    || \
