@@ -6,9 +6,9 @@
 
 #undef HAVE_GETTIMEOFDAY
 
-/* Since Linux/glibc 1.09, OpenBSD 2.0, FreeBSD 1.0, NetBSD 1.0 and Mac OS.
+/* Since Linux/glibc 2.1, OpenBSD 2.0, FreeBSD 1.0, NetBSD 1.0 and Mac OS.
  */
-#if BUILD2_AUTOCONF_GLIBC_PREREQ(1, 9) || \
+#if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 1) || \
     BUILD2_AUTOCONF_FREEBSD_PREREQ(1, 0)|| \
     BUILD2_AUTOCONF_OPENBSD_PREREQ(199610) || \
     BUILD2_AUTOCONF_NETBSD_PREREQ(1, 0) || \
