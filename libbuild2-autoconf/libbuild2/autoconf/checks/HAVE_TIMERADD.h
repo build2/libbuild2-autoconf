@@ -6,9 +6,9 @@
 
 #undef HAVE_TIMERADD
 
-/* Since Linux/glibc 1.90, OpenBSD 2.9, FreeBSD 5.0, NetBSD 6.0 and Mac OS
+/* Since Linux/glibc 2.1, OpenBSD 2.9, FreeBSD 5.0, NetBSD 6.0 and Mac OS
  */
-#if BUILD2_AUTOCONF_GLIBC_PREREQ(1, 90) || \
+#if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 1) || \
     BUILD2_AUTOCONF_FREEBSD_PREREQ(5, 0) || \
     BUILD2_AUTOCONF_OPENBSD_PREREQ(200106) || \
     BUILD2_AUTOCONF_NETBSD_PREREQ(6, 0) || \
