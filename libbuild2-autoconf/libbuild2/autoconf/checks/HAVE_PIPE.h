@@ -6,12 +6,14 @@
 
 #undef HAVE_PIPE
 
-/* Since Version 3 AT&T UNIX (older than 1979),
- * glibc 2.9.
+/* Since Version 3 AT&T UNIX (older than 1979).
+ * Linux, FreeBSD, OpenBSD, NetBSD, Mac OS X, Solaris
  */
-#if defined(__FreeBSD__) || \
-    BUILD2_AUTOCONF_NETBSD_PREREQ(2, 0)    || \
-    BUILD2_AUTOCONF_MACOS_PREREQ(10, 7)    || \
-    BUILD2_AUTOCONF_GLIBC_PREREQ(2, 36)
+#if defined(__linux__)                    || \
+    defined(__FreeBSD__)                  || \
+    defined(__OpenBSD__)                  || \
+    defined(__NetBSD__)                   || \
+    defined(BUILD2_AUTOCONF_MACOS)        || \
+    ((defined(__sun) && defined(__SVR4)) || defined(__sun__))
 #  define HAVE_PIPE 1
 #endif
