@@ -6,9 +6,9 @@
 
 #undef HAVE_VASPRINTF
 
-/*  Since glibc 1.09, FreeBSD 2.2, OpenBSD 2.9, NetBSD 1.4 and MacOS
+/*  Since glibc 2.1, FreeBSD 2.2, OpenBSD 2.9, NetBSD 1.4 and MacOS
  */
-#if BUILD2_AUTOCONF_GLIBC_PREREQ(1, 9)     || \
+#if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 1)     || \
     BUILD2_AUTOCONF_FREEBSD_PREREQ(2, 2)   || \
     BUILD2_AUTOCONF_OPENBSD_PREREQ(200106) || \
     BUILD2_AUTOCONF_NETBSD_PREREQ(1, 4)    || \
