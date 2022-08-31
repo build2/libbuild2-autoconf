@@ -7,7 +7,7 @@
 #undef HAVE_SETENV
 
 /* Since Version 7 AT&T UNIX, 4.3BSD-Tahoe (OpenBSD, FreeBSD, NetBSD, Mac OS X),
-* glibc 1.09
+ * glibc 1.09
  */
 #if defined(__FreeBSD__)            || \
     defined(__OpenBSD__)            || \
