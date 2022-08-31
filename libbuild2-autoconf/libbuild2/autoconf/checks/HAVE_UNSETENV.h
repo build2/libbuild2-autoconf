@@ -1,0 +1,17 @@
+// HAVE_UNSETENV : BUILD2_AUTOCONF_LIBC_VERSION
+
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
+#undef HAVE_UNSETENV
+
+/*  Since glibc 1.90, FreeBSD 1.0, OpenBSD 2.0, NetBSD 1.0 and MacOS
+ */
+#if BUILD2_AUTOCONF_GLIBC_PREREQ(1, 90)     || \
+    BUILD2_AUTOCONF_FREEBSD_PREREQ(1, 0)   || \
+    BUILD2_AUTOCONF_OPENBSD_PREREQ(199610) || \
+    BUILD2_AUTOCONF_NETBSD_PREREQ(1, 0)    || \
+    defined(BUILD2_AUTOCONF_MACOS)
+#  define HAVE_UNSETENV 1
+#endif
