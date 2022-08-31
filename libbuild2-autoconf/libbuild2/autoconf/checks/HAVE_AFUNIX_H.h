@@ -1,4 +1,7 @@
 // HAVE_AFUNIX_H
+
+#undef HAVE_AFUNIX_H
+
 #ifdef _MSC_VER
 #include <sdkddkver.h>
 #endif
