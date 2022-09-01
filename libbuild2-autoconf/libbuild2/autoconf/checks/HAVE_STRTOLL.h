@@ -6,7 +6,7 @@
 
 #undef HAVE_STRTOLL
 
-/* Since 'ISO C99' (OpenBSD ~2.7, FreeBSD ~4.0, NetBSD ~1.5, Mac OS X ~10.0),
+/* Since ISO C99 (OpenBSD ~2.7, FreeBSD ~4.0, NetBSD ~1.5, Mac OS X ~10.0),
  * glibc 1.90
  */
 #if BUILD2_AUTOCONF_OPENBSD_PREREQ(200015) || \

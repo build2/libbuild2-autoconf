@@ -10,6 +10,9 @@
  * NOTE: No reliable sources found.
          See (some) info here: https://bugs.mysql.com/bug.php?id=105562
  */
-// #if ...
-// #  define HAVE_WORKING_KQUEUE 1
-// #endif
+
+/*
+   #if ...
+   #  define HAVE_WORKING_KQUEUE 1
+   #endif
+*/

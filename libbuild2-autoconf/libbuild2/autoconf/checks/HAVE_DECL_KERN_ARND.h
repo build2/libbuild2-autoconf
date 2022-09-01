@@ -5,6 +5,7 @@
 #endif
 
 #undef HAVE_DECL_KERN_ARND
+
 /* OpenBSD 2.6-6.0.
  * NOTE: Only mentioned in OpenBSD manual.
  */

@@ -5,6 +5,7 @@
 #endif
 
 #undef HAVE_DECL_CTL_KERN
+
 /* Since 4.4BSD (OpenBSD 2.1-6.2, FreeBSD, NetBSD, Mac OS X 10.7),
  * <= glibc 2.31.
  * NOTE: Appears to have been available parallel to sysctl()

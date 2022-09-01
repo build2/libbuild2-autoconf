@@ -6,7 +6,7 @@
 
 #undef HAVE_FUTIMES
 
-/* Since Linux/glibc 2.3, FreeBSD 3.x, OpenBSD 1.2 (but the `OpenBSD` macro
+/* Since Linux/glibc 2.3, FreeBSD 3.x, OpenBSD 1.2 (but the OpenBSD macro
  * was only added in 2.0 with a value of 199610), NetBSD 1.2, Mac OS (all
  * versions).
  */
