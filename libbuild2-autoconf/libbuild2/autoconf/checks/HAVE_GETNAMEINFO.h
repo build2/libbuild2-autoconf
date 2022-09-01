@@ -6,8 +6,8 @@
 
 #undef HAVE_GETNAMEINFO
 
-/* Since Linux/glibc 2.1, OpenBSD 2.9, FreeBSD 4.0, NetBSD 1.5, and Mac OS X 
- * (hard to tell but based on the manpages available online it looks like 
+/* Since Linux/glibc 2.1, OpenBSD 2.9, FreeBSD 4.0, NetBSD 1.5, and Mac OS X
+ * (hard to tell but based on the manpages available online it looks like
  * Tiger at the latest).
  */
 #if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 1) || \
