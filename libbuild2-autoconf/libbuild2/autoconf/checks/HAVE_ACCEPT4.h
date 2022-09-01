@@ -1,0 +1,17 @@
+// HAVE_ACCEPT4 : BUILD2_AUTOCONF_LIBC_VERSION
+
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
+#undef HAVE_ACCEPT4
+/* OpenBSD 5.7, FreeBSD 10.0, NetBSD 8.0
+ * Solaris 11.4.0, glibc 2.10
+ * NOTE: Non-standard Linux extension
+ */
+#if BUILD2_AUTOCONF_OPENBSD_PREREQ(201505) || \
+    BUILD2_AUTOCONF_FREEBSD_PREREQ(10, 0)  || \
+    BUILD2_AUTOCONF_NETBSD_PREREQ(8, 0)    || \
+    BUILD2_AUTOCONF_GLIBC_PREREQ(2, 10)
+#  define HAVE_ACCEPT4 1
+#endif
