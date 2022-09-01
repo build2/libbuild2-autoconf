@@ -2,7 +2,7 @@
 
 #undef SIZEOF_VOID_P
 
-#if _WIN64 || __x86_64__ || __ppc64__
+#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__)
 #  define SIZEOF_VOID_P 8
 #else
 #  define SIZEOF_VOID_P 4
