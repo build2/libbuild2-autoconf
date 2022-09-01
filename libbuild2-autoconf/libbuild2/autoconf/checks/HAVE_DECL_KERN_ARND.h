@@ -1,0 +1,13 @@
+// HAVE_DECL_KERN_ARND : BUILD2_AUTOCONF_LIBC_VERSION
+
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
+#undef HAVE_DECL_KERN_ARND
+/* OpenBSD 2.6-6.0.
+ * NOTE: Only mentioned in OpenBSD manual.
+ */
+#if (BUILD2_AUTOCONF_OPENBSD_PREREQ(199912) && !BUILD2_AUTOCONF_OPENBSD_PREREQ(201609))
+#  define HAVE_DECL_KERN_ARND 1
+#endif
