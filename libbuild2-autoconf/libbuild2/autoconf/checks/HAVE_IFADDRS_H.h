@@ -1,0 +1,18 @@
+// HAVE_IFADDRS_H : BUILD2_AUTOCONF_LIBC_VERSION
+
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
+#undef HAVE_IFADDRS_H
+
+/* Since OpenBSD 2.1, FreeBSD 4.1, NetBSD 1.5, Mac OS X (?)
+ * and glibc 2.3.
+ */
+#if BUILD2_AUTOCONF_OPENBSD_PREREQ(200006) || \
+    BUILD2_AUTOCONF_FREEBSD_PREREQ(4, 1)   || \
+    BUILD2_AUTOCONF_NETBSD_PREREQ(1, 5)    || \
+    defined(BUILD2_AUTOCONF_MACOS)         || \
+    BUILD2_AUTOCONF_GLIBC_PREREQ(2, 3)
+#  define HAVE_IFADDRS_H 1
+#endif
