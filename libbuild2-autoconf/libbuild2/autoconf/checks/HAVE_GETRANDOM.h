@@ -1,0 +1,14 @@
+// HAVE_GETRANDOM : BUILD2_AUTOCONF_LIBC_VERSION
+
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
+#undef HAVE_GETRANDOM
+
+/* Since FreeBSD 12.0 and glibc 2.25.
+ */
+#if BUILD2_AUTOCONF_FREEBSD_PREREQ(12, 0)  || \
+    BUILD2_AUTOCONF_GLIBC_PREREQ(2, 25)
+#  define HAVE_GETRANDOM 1
+#endif
