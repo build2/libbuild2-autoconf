@@ -5,12 +5,8 @@
 #endif
 
 #undef ssize_t
-/* Since 4.xBSD, SunOS
- * The Single UNIX ® Specification, Version 2
- *   <sys/socket.h> makes available a type, ssize_t, which is 
- *   an unsigned opaque integral type of length of at least 32 bits. 
- *   To forestall portability problems, it is recommended that 
- *   applications should not use values larger than 232 - 1.
+
+/* POSIX
  */
 #if defined(__linux__)                  || \
     defined(__FreeBSD__)                || \
