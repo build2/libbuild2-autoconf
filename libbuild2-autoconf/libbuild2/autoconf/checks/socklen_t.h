@@ -12,13 +12,18 @@
  *   To forestall portability problems, it is recommended that 
  *   applications should not use values larger than 232 - 1.
  */
-#if defined(__linux__)              || \
-    defined(__FreeBSD__)            || \
-    defined(__OpenBSD__)            || \
-    defined(__NetBSD__)             || \
-    defined(BUILD2_AUTOCONF_MACOS)  || \
-    (defined(__sun) && defined(__SVR4))
+#if defined(__linux__)                  || \
+    defined(__FreeBSD__)                || \
+    defined(__OpenBSD__)                || \
+    defined(__NetBSD__)                 || \
+    defined(BUILD2_AUTOCONF_MACOS)      || \
+    (defined(__sun) && defined(__SVR4)) || \
+    defined(__CYGWIN__)
+#   include <sys/socket.h>
     // If available, we do nothing.
+#elif defined(_WIN32)                   || \
+      defined(__MINGW32__)
+#   include <ws2tcpip.h>
 #else
     // Else define it to unsigned int (suggested fallback by libevent)
 #   define socklen_t unsigned int
