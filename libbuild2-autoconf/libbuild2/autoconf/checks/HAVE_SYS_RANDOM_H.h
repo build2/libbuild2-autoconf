@@ -1,0 +1,15 @@
+// HAVE_SYS_RANDOM_H : BUILD2_AUTOCONF_LIBC_VERSION
+
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
+#undef HAVE_SYS_RANDOM_H
+
+/* FreeBSD 12.0, NetBSD 10.0 and glibc 2.25.
+ */
+#if BUILD2_AUTOCONF_FREEBSD_PREREQ(12, 0)   || \
+    BUILD2_AUTOCONF_NETBSD_PREREQ(10, 0)    || \
+    BUILD2_AUTOCONF_GLIBC_PREREQ(2, 25)
+#  define HAVE_SYS_RANDOM_H 1
+#endif
