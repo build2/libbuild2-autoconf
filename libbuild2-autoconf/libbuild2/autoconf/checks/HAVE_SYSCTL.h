@@ -5,12 +5,13 @@
 #endif
 
 #undef HAVE_SYSCTL
-/* Since 4.4BSD (~1995)
+/* Since 4.4BSD (OpenBSD 2.1-6.2, FreeBSD, NetBSD, Mac OS X 10.7),
+ * <= glibc 2.31.
  */
-#if defined(__linux__)   || \
-    defined(__FreeBSD__) || \
-    defined(__OpenBSD__) || \
-    defined(__NetBSD__)  || \
-    defined(BUILD2_AUTOCONF_MACOS)
+#if (BUILD2_AUTOCONF_OPENBSD_PREREQ(199706) && !BUILD2_AUTOCONF_OPENBSD_PREREQ(201804)) || \
+    BUILD2_AUTOCONF_FREEBSD_PREREQ(2, 3)   || \
+    BUILD2_AUTOCONF_NETBSD_PREREQ(2, 0)    || \
+    BUILD2_AUTOCONF_MACOS_PREREQ(10, 7)    || \
+    !BUILD2_AUTOCONF_GLIBC_PREREQ(2, 32)
 #  define HAVE_SYSCTL 1
 #endif
