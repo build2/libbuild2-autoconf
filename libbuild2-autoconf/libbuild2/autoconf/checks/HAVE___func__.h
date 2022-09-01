@@ -3,8 +3,8 @@
 #undef HAVE___func__
 
 /* HAVE___func__
- * __func__ was added to the standard in C++11.
+ * __func__ was added to the standard in C++11. But seemingly exists 
+ * almost everywhere before that as well.
  */
-#if (defined(__cplusplus) && __cplusplus >= 201103L) || defined(_MSVC_LANG) && (_MSVC_LANG >= 1900)
-#   define HAVE___func__ 1
-#endif
+
+#define HAVE___func__ 1
