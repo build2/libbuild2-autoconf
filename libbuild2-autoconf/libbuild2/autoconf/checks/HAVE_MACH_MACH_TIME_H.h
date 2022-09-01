@@ -1,0 +1,13 @@
+// HAVE_MACH_MACH_TIME_H : BUILD2_AUTOCONF_LIBC_VERSION
+
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
+#undef HAVE_MACH_MACH_TIME_H
+
+/* Mac OS X 10.0
+ */
+#if BUILD2_AUTOCONF_MACOS_PREREQ(10, 0)
+#  define HAVE_MACH_MACH_TIME_H 1
+#endif
