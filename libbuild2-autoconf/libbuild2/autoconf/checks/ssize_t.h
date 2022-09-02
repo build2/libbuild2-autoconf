@@ -20,8 +20,9 @@
    /* If available, we do nothing. */
 #elif defined(_WIN32)
 #  include <basetsd.h>
-   typedef SSIZE_T ssize_t;
+   /* Use define instead of typedef to avoid conflicts. */
+#  define ssize_t SSIZE_T
 #else
    /* Else define it to int (suggested fallback by libevent). */
-#   define ssize_t int
+#  define ssize_t int
 #endif
