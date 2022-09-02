@@ -20,10 +20,8 @@
     defined(BUILD2_AUTOCONF_MACOS)      || \
     (defined(__sun) && defined(__SVR4)) || \
     defined(__CYGWIN__)
-#   include <sys/socket.h>
     /* If available, we do nothing. */
 #elif defined(_WIN32)
-#   include <ws2tcpip.h>
     /* If available, we do nothing. */
 #else
     /* Else define it to unsigned int (suggested fallback by libevent). */

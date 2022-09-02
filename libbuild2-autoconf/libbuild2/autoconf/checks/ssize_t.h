@@ -16,11 +16,10 @@
     defined(__MINGW32__)                || \
     (defined(__sun) && defined(__SVR4)) || \
     defined(__CYGWIN__)
-#  include <sys/types.h>
    /* If available, we do nothing. */
 #elif defined(_WIN32)
-#  include <basetsd.h>
-   typedef SSIZE_T ssize_t;
+#   include <basetsd.h>
+#   define ssize_t SSIZE_T
 #else
    /* Else define it to int (suggested fallback by libevent). */
 #   define ssize_t int
