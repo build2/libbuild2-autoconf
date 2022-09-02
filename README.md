@@ -55,8 +55,8 @@ h{config}: in{config}
 ```
 
 Besides the built-in configuration options, custom substitutions can be
-specified as `buildfile` variables in the same way as with the
-[`in`][module-in] module. For example:
+specified as `buildfile` variables or key-value pairs in the same way as with
+the [`in`][module-in] module. For example, as `buildfile` variables:
 
 ```
 /* config.h.in */
@@ -76,7 +76,35 @@ h{config}: in{config}
 }
 ```
 
-This mechanism can also be used to override the built-in checks, for example:
+As key-value pairs in the `autoconf.substitutions` map (which is an alias for
+the `in.substitutions` variable; see the [`in`][module-in] module for
+details):
+
+```
+/* config.h.in */
+
+#undef _GNU_SOURCE
+#undef _POSIX_SOURCE
+```
+
+```
+gnu_source = ($c.stdlib == 'glibc')
+posix_source = ($c.target.class != 'windows' && !$gnu_source)
+
+h{config}: in{config}
+{
+  autoconf.substitutions  = _GNU_SOURCE@$gnu_source
+  autoconf.substitutions += _POSIX_SOURCE@$posix_source
+}
+```
+
+In particular, the `autoconf.substitutions` mechanism is the only way to have
+substitutions that cannot be specified as `buildfile` variables because they
+start with an underscore (and thus are reserved, as in the above example) or
+refer to one of the predefined variables.
+
+The custom substitutions can also be used to override the built-in checks, for
+example:
 
 ```
 h{config}: in{config}

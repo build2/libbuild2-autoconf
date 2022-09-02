@@ -401,3 +401,26 @@ cat config.h >>EOO
   #  define PREFIX_zzz_TEST_DUMMY5_H PREFIX_zzz_TEST_DUMMY4_H
   #endif /*zzz_TEST_DUMMY3_H*/
   EOO
+
+: substitution-map
+:
+mkdir build;
+ln -s ../../bootstrap.build ../../root.build build/;
+cat <<EOI >=config.h.in;
+  #undef _GNU_SOURCE
+  #undef _POSIX_SOURCE
+  #undef FOO
+  EOI
+$* <<EOI &config.h &config.h.d;
+  gnu = false
+  ./: h{config}: in{config}
+  {
+    autoconf.substitutions = _GNU_SOURCE@$gnu _POSIX_SOURCE@true
+    FOO = true
+  }
+  EOI
+cat config.h >>EOO
+  #undef _GNU_SOURCE
+  #define _POSIX_SOURCE 1
+  #define FOO 1
+  EOO

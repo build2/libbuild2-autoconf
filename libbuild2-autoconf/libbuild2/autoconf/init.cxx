@@ -43,6 +43,11 @@ namespace build2
         // Built-in checks prefix.
         //
         vp.insert<string> ("autoconf.prefix");
+
+        // Substitution map (an alias for in.substitutions).
+        //
+        vp.insert_alias (*vp.find ("in.substitutions"),
+                         "autoconf.substitutions");
       }
 
       // Register the rule.

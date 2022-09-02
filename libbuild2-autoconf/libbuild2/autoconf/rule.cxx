@@ -144,6 +144,7 @@ namespace build2
              const char* nl,
              char sym,
              bool strict,
+             const substitution_map* smap,
              const optional<string>& null) const
     {
       auto ws = [] (char c)
@@ -182,7 +183,7 @@ namespace build2
                                  &l,
                                  a, &t,
                                  &dd, &dd_skip,
-                                 nl, strict, &null,
+                                 nl, strict, smap, &null,
                                  &s] (const string& name,
                                       bool value = true) -> optional<bool>
       {
@@ -195,7 +196,7 @@ namespace build2
                                          a, t,
                                          dd, dd_skip,
                                          name, 1 /* flags */,
-                                         strict, null));
+                                         strict, smap, null));
 
         assert (ov); // C identifier is a valid variable name.
         string& v (*ov);
@@ -470,7 +471,8 @@ namespace build2
         }
       }
 
-      in::rule::process (l, a, t, dd, dd_skip, s, b, nl, sym, strict, null);
+      in::rule::process (
+        l, a, t, dd, dd_skip, s, b, nl, sym, strict, smap, null);
     }
 
     string rule::
@@ -478,6 +480,7 @@ namespace build2
             action a, const target& t,
             const string& n,
             optional<uint64_t> flags,
+            const substitution_map* smap,
             const optional<string>& null) const
     {
       if (flags)
@@ -508,7 +511,7 @@ namespace build2
         //    variable is unlikely, something like const or volatile is
         //    possible. Since there is no way to undefine a buildfile variable
         //    (becasue we could always see a value from the outer scope), we
-        //    will treat null as an indication to use the built-in check.
+        //    will treat null as an instruction to use the built-in check.
         //    While this clashes with the in.null semantics, it's just as
         //    easy to set the variable to the real default value as to null.
         //
@@ -554,11 +557,31 @@ namespace build2
                   (!up || strchr (i->modifier, '!') != nullptr)) ? i : nullptr;
         };
 
-        // Note: original name in variable lookup.
+        // Return true if there is a custom substitution for the name.
+        //
+        // Note: see above on the special NULL semantics.
+        //
+        auto custom = [&t, smap] (const string& n) -> bool
+        {
+          if (smap != nullptr)
+          {
+            auto i (smap->find (n));
+
+            // Note that we treat NULL as the "use built-in check" instruction
+            // (see above). So it's a return, not fall through.
+            //
+            if (i != smap->end ())
+              return i->second.has_value ();
+          }
+
+          return static_cast<bool> (t[n]);
+        };
+
+        // Note: original name in the custom substitution lookup.
         //
         const check* c (find (en, pn == nullptr));
 
-        if (c != nullptr && !t[n])
+        if (c != nullptr && !custom (n))
         {
           // The plan is as follows: keep adding base checks (suppressing
           // duplicates) followed by the main check while prefixing all the
@@ -616,11 +639,12 @@ namespace build2
           //          Buildscript).
           //
           auto base = [this,
-                       &l, &t, a, &null,
+                       &l, &t, a, smap, &null,
                        &md, &p, &ns,
-                       &find, &append, &prefix] (const string& n,
-                                                 const char* bs,
-                                                 const auto& base) -> void
+                       &find, &custom,
+                       &append, &prefix] (const string& n,
+                                          const char* bs,
+                                          const auto& base) -> void
           {
             auto df = make_diag_frame (
               [&n] (const diag_record& dr)
@@ -666,9 +690,9 @@ namespace build2
 
               md.checks.emplace (pn, n);
 
-              if (t[n])
-                append (
-                  this->in::rule::lookup (l, a, t, n, nullopt, null).c_str ());
+              if (custom (n))
+                append (this->in::rule::lookup (
+                          l, a, t, n, nullopt, smap, null).c_str ());
               else
               {
                 if (*c->base != '\0')
@@ -706,7 +730,7 @@ namespace build2
         }
       }
 
-      return in::rule::lookup (l, a, t, n, nullopt, null);
+      return in::rule::lookup (l, a, t, n, nullopt, smap, null);
     }
   }
 }

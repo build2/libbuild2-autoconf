@@ -39,6 +39,7 @@ namespace build2
                const char*,
                char,
                bool,
+               const substitution_map*,
                const optional<string>&) const override;
 
       virtual string
@@ -46,6 +47,7 @@ namespace build2
               action, const target&,
               const string&,
               optional<uint64_t>,
+              const substitution_map*,
               const optional<string>&) const override;
     };
   }
