@@ -6,7 +6,7 @@
 
 #undef ssize_t
 
-/* POSIX and MinGW (which also has <sys/types.h> that defines ssize_t).
+/* POSIX and MinGW (which also has <sys/types.h> that defines ssize_t), Windows
  */
 #if defined(__linux__)                  || \
     defined(__FreeBSD__)                || \
