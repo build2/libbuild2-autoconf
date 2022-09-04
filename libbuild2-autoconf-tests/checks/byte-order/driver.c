@@ -1,10 +1,10 @@
-#include <stdint.h> // uint32_t
-
-#include "config.h"
-
 /* Test that the byte order detected at runtime matches the one detected at
  * compile time.
  */
+
+#include <stdint.h> /* uint32_t */
+
+#include "config.h"
 
 /* Return:
  *

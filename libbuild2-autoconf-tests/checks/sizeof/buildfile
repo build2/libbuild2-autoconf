@@ -1,0 +1,11 @@
+exe{driver}: c{driver} h{config}
+
+h{config}: in{config}
+
+c.poptions += "-I$out_base"
+
+if ($c.target.system != 'win32-msvc')
+{
+  c.libs += -pthread
+  c.poptions += -DTEST_PTHREAD
+}

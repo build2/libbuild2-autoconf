@@ -1,0 +1,2 @@
+#undef SIZEOF_OFF_T
+#undef SIZEOF_PTHREAD_T
