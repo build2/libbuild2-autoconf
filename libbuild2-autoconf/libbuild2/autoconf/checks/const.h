@@ -1,4 +1,4 @@
-// const
+// const!
 
 /* This check is unusual in that for a positive answer (the compiler supports
    const) we undefine const to allow the compiler to recognize it as a keyword

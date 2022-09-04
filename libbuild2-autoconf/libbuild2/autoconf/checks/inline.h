@@ -1,4 +1,4 @@
-// inline
+// inline!
 
 /* This check is unusual in that for a positive answer (the compiler supports
    inline) we undefine inline to allow the compiler to recognize it as a
