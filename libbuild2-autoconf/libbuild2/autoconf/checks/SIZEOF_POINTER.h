@@ -1,6 +1,6 @@
 // SIZEOF_POINTER
 
-/* See also SIZEOF_SIZE_T (the two may not be the same). */
+/* See also SIZEOF_SIZE_T (the two may not be the same), SIZEOF_VOID_P. */
 
 #undef SIZEOF_POINTER
 
