@@ -3,7 +3,7 @@
 #undef SIZEOF_PTHREAD_T
 
 #ifndef _WIN32
-#   ifdef defined(__APPLE__)
+#   if defined(__APPLE__)
 #       ifdef __LP64__
 #           define SIZEOF_PTHREAD_T 8
 #       else
