@@ -32,10 +32,15 @@
  * #if defined(__OpenBSD__)
  * #if defined(__NetBSD__)
  *
- * Except for MacOS, which we detect using our own macro (for the sake of
- * simplicity):
+ * Except for MacOS specifically, which we detect using our own macro (for
+ * the sake of simplicity):
  *
  * #if defined(BUILD2_AUTOCONF_MACOS)
+ *
+ * If, however, you want to cover the entire Apple operation systems family,
+ * then use:
+ *
+ * #if defined(__APPLE__)
  *
  * Macros for detecting platforms and their versions:
  *

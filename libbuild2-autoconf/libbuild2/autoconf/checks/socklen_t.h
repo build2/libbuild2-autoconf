@@ -1,10 +1,9 @@
-// socklen_t : BUILD2_AUTOCONF_LIBC_VERSION
+// socklen_t!
 
-#ifndef BUILD2_AUTOCONF_LIBC_VERSION
-#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
-#endif
-
-#undef socklen_t
+/* If socklen_t is already defined, assume it's correct and use it as-is (see
+ * ssize_t for details).
+ */
+#ifndef socklen_t
 
 /* Since 4.xBSD, SunOS
  * The Single UNIX Specification, Version 2
@@ -13,19 +12,20 @@
  *   To forestall portability problems, it is recommended that
  *   applications should not use values larger than 232 - 1.
  */
-#if defined(__linux__)                  || \
-    defined(__FreeBSD__)                || \
-    defined(__OpenBSD__)                || \
-    defined(__NetBSD__)                 || \
-    defined(BUILD2_AUTOCONF_MACOS)      || \
-    (defined(__sun) && defined(__SVR4)) || \
-    defined(__CYGWIN__)
-#   include <sys/socket.h>
-    /* If available, we do nothing. */
-#elif defined(_WIN32)
-#   include <ws2tcpip.h>
-    /* If available, we do nothing. */
-#else
-    /* Else define it to unsigned int (suggested fallback by libevent). */
-#   define socklen_t unsigned int
+#  if defined(__linux__)                  || \
+      defined(__FreeBSD__)                || \
+      defined(__OpenBSD__)                || \
+      defined(__NetBSD__)                 || \
+      defined(__APPLE__)                  || \
+      (defined(__sun) && defined(__SVR4)) || \
+      defined(__CYGWIN__)
+#     include <sys/socket.h>
+      /* If available, we do nothing. */
+#  elif defined(_WIN32)
+#     include <ws2tcpip.h>
+      /* If available, we do nothing. */
+#  else
+      /* Else define it to unsigned int (suggested fallback by libevent). */
+#     define socklen_t unsigned int
+#  endif
 #endif
