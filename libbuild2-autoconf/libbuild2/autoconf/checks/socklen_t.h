@@ -22,8 +22,13 @@
 #     include <sys/socket.h>
       /* If available, we do nothing. */
 #  elif defined(_WIN32)
-#     include <ws2tcpip.h>
-      /* If available, we do nothing. */
+      /* While socklen_t is declared in <ws2tcpip.h>, including this header is
+       * hazardous due to it being sensitive to WIN32_LEAN_AND_MEAN (and who
+       * knows what else). At the same time, in both Platform SDK and MinGW,
+       * this is a simple int typedef and so just doing that feels like the
+       * simplest (if hackish) way to sidestep the whole mess.
+       */
+      typedef int socklen_t;
 #  else
       /* Else define it to unsigned int (suggested fallback by libevent). */
 #     define socklen_t unsigned int
