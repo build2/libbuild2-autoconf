@@ -2,14 +2,12 @@
 
 #undef SIZEOF_PTHREAD_T
 
-#ifndef _WIN32
-#   if defined(__APPLE__)
-#       ifdef __LP64__
-#           define SIZEOF_PTHREAD_T 8
-#       else
-#           define SIZEOF_PTHREAD_T 4
-#       endif
-#   else
-#       define SIZEOF_PTHREAD_T 4
-#   endif
+#ifndef _MSC_VER
+#  ifdef __SIZEOF_POINTER__
+#    define SIZEOF_PTHREAD_T __SIZEOF_POINTER__
+#  endif
+
+#  ifndef SIZEOF_PTHREAD_T
+#    error unable to determine size of pthread_t
+#  endif
 #endif
