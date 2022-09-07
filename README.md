@@ -117,7 +117,7 @@ While this module provides widely used aliases for some checks, it doesn't
 attempt to cover every project's idiosyncrasies. Instead, it provides a
 mechanism for creating project-specific aliases for built-in
 checks. Specifically, the desired aliases can be specified as key-value pairs
-in the `autoconf.aliases` map with key being the new name and the value --
+in the `autoconf.aliases` map with the key being the new name and the value --
 old/existing. For example:
 
 ```
