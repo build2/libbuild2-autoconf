@@ -20,4 +20,6 @@ main ()
 #ifdef TEST_PTHREAD
   assert (SIZEOF_PTHREAD_T == sizeof (pthread_t));
 #endif
+
+  return 0;
 }
