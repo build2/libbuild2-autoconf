@@ -19,6 +19,8 @@ namespace build2
   {
     enum class flavor {autoconf, cmake, meson};
 
+    using alias_map = map<string, string>;
+
     // Wrap the in::rule's perform_update recipe into a data-carrying recipe.
     //
     // To optimize this a bit further we will call in::rule::perform_update()
@@ -29,7 +31,8 @@ namespace build2
     {
       autoconf::flavor    flavor;
       string              prefix;
-      map<string, string> checks; // Checks already seen.
+      const alias_map*    aliases;
+      map<string, string> checks;   // Checks already seen.
 
       const autoconf::rule& rule;
 
@@ -89,11 +92,12 @@ namespace build2
           }
         }
 
-        // Get the prefix if any.
+        // Get the prefix and aliases, if any.
         //
         string p (cast_empty<string> (t["autoconf.prefix"]));
+        const alias_map* a (cast_null<alias_map> (t["autoconf.aliases"]));
 
-        return match_data {f, move (p), {}, *this};
+        return match_data {f, move (p), a, {}, *this};
       }
 
       return r;
@@ -502,10 +506,7 @@ namespace build2
         //    looking it up. So we store prefixless. Actually, it's convenient
         //    to store both.
         //
-        // 2. Look in the catalog and fall through if not found.
-        //
-        // 3. If found, then check for a custom value falling through if
-        //    found.
+        // 2. Check for a custom value falling through if found.
         //
         //    Here things get a bit tricky: while a stray HAVE_* buildfile
         //    variable is unlikely, something like const or volatile is
@@ -515,22 +516,29 @@ namespace build2
         //    While this clashes with the in.null semantics, it's just as
         //    easy to set the variable to the real default value as to null.
         //
+        //
+        // 3. Look in the catalog and fall through if not found.
+        //
         // 4. Return the build-in value from the catalog.
         //
-        const char* pn (nullptr); // Prefixless name.
-
-        const string& p (md.prefix);
-        if (!p.empty ())
+        auto deprefix = [&md] (const string& n) -> const char*
         {
-          // Note that if there is no prefix, then we only look for an
-          // unprefixable built-in check.
-          //
-          if (n.size () > p.size () && n.compare (0, p.size (), p) == 0)
-            pn = n.c_str () + p.size ();
-        }
-        else
-          pn = n.c_str ();
+          const string& p (md.prefix);
 
+          if (!p.empty ())
+          {
+            return (n.size () > p.size () && n.compare (0, p.size (), p) == 0
+                    ? n.c_str () + p.size ()
+                    : nullptr);
+          }
+          else
+            return n.c_str ();
+        };
+
+        // Note that if there is no prefix in the name, then we only look for
+        // an unprefixable built-in check.
+        //
+        const char* pn (deprefix (n));                    // Prefixless name.
         const char* en (pn != nullptr ? pn : n.c_str ()); // Effective name.
 
         // Note: this line must be recognizable by substitute_special().
@@ -579,13 +587,11 @@ namespace build2
 
         // Note: original name in the custom substitution lookup.
         //
-        const check* c (find (en, pn == nullptr));
-
-        if (c != nullptr && !custom (n))
+        if (!custom (n))
         {
-          // The plan is as follows: keep adding base checks (suppressing
-          // duplicates) followed by the main check while prefixing all the
-          // already seen names (unless unprefixable).
+          // The overall plan is as follows: add checks (to r; suppressing
+          // duplicates) while prefixing all the already seen names (in ns;
+          // unless unprefixable).
           //
           string r;
           small_vector<string, 1> ns;
@@ -605,9 +611,11 @@ namespace build2
             r += v;
           };
 
-          auto prefix = [&p, &ns, &r, b = size_t (0)] () mutable
+          auto prefix = [&md, &ns, &r, b = size_t (0)] () mutable
           {
             auto sep = [] (char c) { return !alnum (c) && c != '_'; };
+
+            const string& p (md.prefix);
 
             for (const string& n: ns)
             {
@@ -627,7 +635,7 @@ namespace build2
             b = r.size ();
           };
 
-          // Base checks.
+          // Append base checks.
           //
           // @@ TODO: detect cycles (currently we just prune, like an
           //          include guard).
@@ -640,16 +648,16 @@ namespace build2
           //
           auto base = [this,
                        &l, &t, a, smap, &null,
-                       &md, &p, &ns,
+                       &md, &ns,
                        &find, &custom,
-                       &append, &prefix] (const string& n,
+                       &append, &prefix] (const string& dn,
                                           const char* bs,
                                           const auto& base) -> void
           {
             auto df = make_diag_frame (
-              [&n] (const diag_record& dr)
+              [&dn] (const diag_record& dr)
               {
-                dr << info << "while resolving base options for " << n;
+                dr << info << "while resolving base options for " << dn;
               });
 
             for (size_t b (0), e (0); next_word (bs, b, e); )
@@ -686,7 +694,7 @@ namespace build2
               //
               bool up (strchr (c->modifier, '!') != nullptr);
 
-              string n ((up ? string () : p) + pn);
+              string n ((up ? string () : md.prefix) + pn);
 
               md.checks.emplace (pn, n);
 
@@ -701,7 +709,7 @@ namespace build2
                 append (c->value);
               }
 
-              if (!p.empty ())
+              if (!md.prefix.empty ())
               {
                 if (!up)
                   ns.push_back (move (pn));
@@ -711,22 +719,86 @@ namespace build2
             }
           };
 
-          if (*c->base != '\0')
-            base (n, c->base, base);
-
-          // Main check.
+          // Return true if the built-in check is prefix-compatible with the
+          // substitution.
           //
-          append (c->value);
-
-          if (!p.empty ())
+          auto prefix_compatible = [&md] (const check* c, const char* pn)
           {
-            if (pn != nullptr) // Not unprefixable.
-              ns.push_back (pn);
+            return (md.prefix.empty ()                   || // No prefix.
+                    strchr (c->modifier, '!') == nullptr || // Prefixable.
+                    pn == nullptr);                         // Unprefixed.
+          };
 
-            prefix ();
+          // See if this is an alias.
+          //
+          if (md.aliases != nullptr)
+          {
+            auto i (md.aliases->find (n));
+            if (i != md.aliases->end ())
+            {
+              // Reduce this to the base with a synthesized "derived" check
+              // (pretty much how we would implement it if it were a built-in
+              // check).
+              //
+              const string& an (i->second);
+
+              pn = deprefix (an);
+              en = pn != nullptr ? pn : an.c_str ();
+
+              const check* c (find (en, pn == nullptr));
+              if (c == nullptr || !prefix_compatible (c, pn))
+                fail (l) << "unknown aliased option " << en <<
+                  info << "while resolving alias " << n;
+
+              base (n, en, base);
+
+              // As a heuristics, for an unprefixable check we do a straight
+              // #define since it may not be a macro (see ssize_t).
+              //
+              // Note also that all the names are already prefixed, if
+              // necessary.
+              //
+              if (strchr (c->modifier, '!') != nullptr)
+              {
+                append (("#undef " + n + '\n' +
+                         "#define " + n + ' ' + an + '\n').c_str ());
+              }
+              else
+              {
+                append (("#undef " + n + '\n' +
+                         "#ifdef " + an + '\n' +
+                         "#  define " + n + ' ' + an + '\n' +
+                         "#endif\n").c_str ());
+              }
+
+              return r;
+            }
           }
 
-          return r;
+          const check* c (find (en, pn == nullptr));
+          if (c != nullptr && prefix_compatible (c, pn))
+          {
+            // The plan is as follows: keep adding base checks (suppressing
+            // duplicates) followed by the main check while prefixing all the
+            // already seen names (unless unprefixable).
+            //
+            if (*c->base != '\0')
+              base (n, c->base, base);
+
+            // Main check.
+            //
+            append (c->value);
+
+            if (!md.prefix.empty ())
+            {
+              if (pn != nullptr) // Not unprefixable.
+                ns.push_back (pn);
+
+              prefix ();
+            }
+
+            return r;
+          }
         }
       }
 

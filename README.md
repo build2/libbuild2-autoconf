@@ -76,8 +76,8 @@ h{config}: in{config}
 }
 ```
 
-As key-value pairs in the `autoconf.substitutions` map (which is an alias for
-the `in.substitutions` variable; see the [`in`][module-in] module for
+Or as key-value pairs in the `autoconf.substitutions` map (which is an alias
+for the `in.substitutions` variable; see the [`in`][module-in] module for
 details):
 
 ```
@@ -113,10 +113,74 @@ h{config}: in{config}
 }
 ```
 
-Note that an implementation of a check may depend on another check. As a
-result, substitutions should not be conditional at the preprocessor level
-(unless all the checks are part of the same condition). Nor should the
-results of checks be adjusted until after the last check. For example:
+While this module provides widely used aliases for some checks, it doesn't
+attempt to cover every project's idiosyncrasies. Instead, it provides a
+mechanism for creating project-specific aliases for built-in
+checks. Specifically, the desired aliases can be specified as key-value pairs
+in the `autoconf.aliases` map with key being the new name and the value --
+old/existing. For example:
+
+```
+/* config.h.in */
+
+#undef HAVE_AF_UNIX_H
+#undef MY_SSIZE_T
+```
+
+```
+h{config}: in{config}
+{
+  autoconf.aliases  = HAVE_AF_UNIX_H@HAVE_AFUNIX_H
+  autoconf.aliases += MY_SSIZE_T@ssize_t
+}
+```
+
+The built-in checks can be prefixed in order to avoid clashes with similarly
+named macros in other headers. This is an especially good idea if the
+resulting header is public. To enable this, we specify the prefix with
+the `autoconf.prefix` variable and then use the prefixed versions of
+the options in the `config.h.in` file. For example:
+
+```
+/* config.h.in */
+
+#undef LIBFOO_HAVE_STRLCPY
+#undef LIBFOO_HAVE_STRLCAT
+```
+
+```
+h{config}: in{config}
+{
+  autoconf.prefix = LIBFOO_
+}
+```
+
+Note that `autoconf.prefix` only affects the lookup of the built-in checks.
+Custom substitutions and overrides of built-in checks must include the
+prefix. Similarly, both names in `autoconf.aliases` must be specified
+with the prefix (unless unprefixable; see below). For example:
+
+```
+h{config}: in{config}
+{
+  autoconf.prefix = LIBFOO_
+
+  LIBFOO_HAVE_STRLCPY = true
+
+  autoconf.aliases = LIBFOO_SSIZE_T@ssize_t
+}
+```
+
+Note also that some built-in check names are *unprefixable*, usually because
+they are standard macro names (for example, `BYTE_ORDER`) that on some
+platforms come from system headers (for example, `<sys/endian.h>` on FreeBSD).
+Such checks have `!` after their names on the first line of their
+implementation files (for example, `// BYTE_ORDER!`).
+
+An implementation of a check may depend on another check. As a result,
+substitutions should not be conditional at the preprocessor level (unless all
+the checks are part of the same condition). Nor should the results of checks
+be adjusted until after the last check. For example:
 
 ```
 #ifndef _WIN32
@@ -151,46 +215,6 @@ Below is the correct way to achieve the above semantics:
 #  undef BYTE_ORDER
 #endif
 ```
-
-The built-in checks can be prefixed in order to avoid clashes with similarly
-named macros in other headers. This is an especially good idea if the
-resulting header is public. To enable this, we specify the prefix with
-the `autoconf.prefix` variable and then use the prefixed versions of
-the options in the `config.h.in` file. For example:
-
-```
-/* config.h.in */
-
-#undef LIBFOO_HAVE_STRLCPY
-#undef LIBFOO_HAVE_STRLCAT
-```
-
-```
-h{config}: in{config}
-{
-  autoconf.prefix = LIBFOO_
-}
-```
-
-Note that `autoconf.prefix` only affects the lookup of the built-in checks.
-Custom substitutions and overrides of built-in checks must include the
-prefix. For example:
-
-```
-h{config}: in{config}
-{
-  autoconf.prefix = LIBFOO_
-
-  LIBFOO_HAVE_STRLCPY = true
-}
-```
-
-Note also that some built-in check names are *unprefixable*, usually because
-they are standard macro names (for example, `BYTE_ORDER`) that on some
-platforms come from system headers (for example, `<sys/endian.h>` on FreeBSD).
-Such checks have `!` after their names on the first line of their
-implementation files (for example, `// BYTE_ORDER!`).
-
 
 ## Adding new checks
 

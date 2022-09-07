@@ -48,6 +48,14 @@ namespace build2
         //
         vp.insert_alias (*vp.find ("in.substitutions"),
                          "autoconf.substitutions");
+
+        // Alias map. The key is the new name and the value is the aliased
+        // (old) name.
+        //
+        // Note that this map is only consulted when resolving build-in checks
+        // and the names should include the prefix, if any.
+        //
+        vp.insert<map<string, string>> ("autoconf.aliases");
       }
 
       // Register the rule.

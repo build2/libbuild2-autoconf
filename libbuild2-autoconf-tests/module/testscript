@@ -424,3 +424,77 @@ cat config.h >>EOO
   #define _POSIX_SOURCE 1
   #define FOO 1
   EOO
+
+: alias-map
+:
+mkdir build;
+ln -s ../../bootstrap.build ../../root.build build/;
+cat <<EOI >=config.h.in;
+  #undef TEST_DUMMY1_H
+
+  #undef TEST_DUMMY2_H
+
+  #undef TEST_DUMMY3_H
+  EOI
+$* <<EOI &config.h &config.h.d;
+  ./: h{config}: in{config}
+  {
+    autoconf.aliases  = TEST_DUMMY1_H@zzz_TEST_DUMMY1_H
+    autoconf.aliases += TEST_DUMMY2_H@zzz_TEST_DUMMY2_H
+    autoconf.aliases += TEST_DUMMY3_H@zzz_TEST_DUMMY3_H
+
+    zzz_TEST_DUMMY2_H = '#define zzz_TEST_DUMMY2_H 20'
+  }
+  EOI
+cat config.h >>EOO
+  #define zzz_TEST_DUMMY1_H 1
+
+  #undef TEST_DUMMY1_H
+  #ifdef zzz_TEST_DUMMY1_H
+  #  define TEST_DUMMY1_H zzz_TEST_DUMMY1_H
+  #endif
+
+  #define zzz_TEST_DUMMY2_H 20
+
+  #undef TEST_DUMMY2_H
+  #ifdef zzz_TEST_DUMMY2_H
+  #  define TEST_DUMMY2_H zzz_TEST_DUMMY2_H
+  #endif
+
+  #define zzz_TEST_DUMMY3_H 1
+
+  #undef TEST_DUMMY3_H
+  #define TEST_DUMMY3_H zzz_TEST_DUMMY3_H
+  EOO
+
+: alias-map-prefix
+:
+mkdir build;
+ln -s ../../bootstrap.build ../../root.build build/;
+cat <<EOI >=config.h.in;
+  #undef PREFIX_TEST_DUMMY1_H
+
+  #undef PREFIX_TEST_DUMMY3_H
+  EOI
+$* <<EOI &config.h &config.h.d;
+  ./: h{config}: in{config}
+  {
+    autoconf.prefix = PREFIX_
+
+    autoconf.aliases  = PREFIX_TEST_DUMMY1_H@PREFIX_zzz_TEST_DUMMY1_H
+    autoconf.aliases += PREFIX_TEST_DUMMY3_H@zzz_TEST_DUMMY3_H
+  }
+  EOI
+cat config.h >>EOO
+  #define PREFIX_zzz_TEST_DUMMY1_H 1
+
+  #undef PREFIX_TEST_DUMMY1_H
+  #ifdef PREFIX_zzz_TEST_DUMMY1_H
+  #  define PREFIX_TEST_DUMMY1_H PREFIX_zzz_TEST_DUMMY1_H
+  #endif
+
+  #define zzz_TEST_DUMMY3_H 1
+
+  #undef PREFIX_TEST_DUMMY3_H
+  #define PREFIX_TEST_DUMMY3_H zzz_TEST_DUMMY3_H
+  EOO
