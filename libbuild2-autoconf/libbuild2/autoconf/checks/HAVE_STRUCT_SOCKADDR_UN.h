@@ -8,7 +8,7 @@
 
 /* Linux/glibc 1.09, Since 4.4BSD (~1995)
  */
-#if BUILD2_AUTOCONF_GLIBC_PREREQ(1, 09) || \
+#if BUILD2_AUTOCONF_GLIBC_PREREQ(1, 9) || \
     defined(__FreeBSD__)                || \
     defined(__OpenBSD__)                || \
     defined(__NetBSD__)                 || \

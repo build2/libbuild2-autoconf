@@ -13,6 +13,6 @@
     defined(__OpenBSD__)            || \
     defined(__NetBSD__)             || \
     defined(BUILD2_AUTOCONF_MACOS)  || \
-    BUILD2_AUTOCONF_GLIBC_PREREQ(1, 09)
+    BUILD2_AUTOCONF_GLIBC_PREREQ(1, 9)
 #  define HAVE_SETENV 1
 #endif
