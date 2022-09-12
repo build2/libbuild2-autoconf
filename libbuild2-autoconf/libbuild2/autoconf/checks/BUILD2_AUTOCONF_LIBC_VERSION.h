@@ -105,12 +105,16 @@
 
 /* BUILD2_AUTOCONF_GLIBC_PREREQ(maj, min)
  *
- * Return 1 if the given version number is >= the glibc version, or 0
+ * Return 1 if the glibc version is >= the given version number, or 0
  * otherwise.
  *
- * __GLIBC_PREREQ() was only added in glibc 2.2 (released in 2000) so define
+ * __GLIBC_PREREQ() first appeared in glibc 2.2 (released in 2000) so define
  * BUILD2_AUTOCONF_GLIBC_PREREQ() using its latest glibc implementation if it
  * is not defined.
+ *
+ * __GLIBC__ and __GLIBC_MINOR__ first appeared in glibc 1.97 on 1996-10-22
+ * (but only released in glibc 2.0 on 1997-01-26) with no preceding equivalent
+ * so always return 0 if these macros are not defined.
  */
 #if defined(__GLIBC__) && defined(__GLIBC_MINOR__)
 #  if defined(__GLIBC_PREREQ)
@@ -125,7 +129,7 @@
 
 /* BUILD2_AUTOCONF_FREEBSD_PREREQ(maj, min)
  *
- * Return 1 if the given version number is >= the FreeBSD version, or 0
+ * Return 1 if the FreeBSD version is >= the given version number, or 0
  * otherwise.
  */
 #if defined(__FreeBSD__) && defined(__FreeBSD_version)
@@ -137,8 +141,8 @@
 
 /* BUILD2_AUTOCONF_OPENBSD_PREREQ(yyyymm)
  *
- * Return 1 if the given release date is >= the release date of the OpenBSD
- * version, or 0 otherwise.
+ * Return 1 if the release date of the OpenBSD version is >= the given release
+ * date, or 0 otherwise.
  */
 #if defined(__OpenBSD__) && defined(OpenBSD)
 #  define BUILD2_AUTOCONF_OPENBSD_PREREQ(yyyymm) (OpenBSD >= (yyyymm))
@@ -148,7 +152,7 @@
 
 /* BUILD2_AUTOCONF_NETBSD_PREREQ(maj, min)
  *
- * Return 1 if the given version number is >= the NetBSD version, or 0
+ * Return 1 if the NetBSD version is >= the given version number, or 0
  * otherwise.
  */
 #if defined(__NetBSD__) && defined(__NetBSD_Version__)
@@ -160,7 +164,7 @@
 
 /* BUILD2_AUTOCONF_MACOS_PREREQ(maj, min)
  *
- * Return 1 if the given version number is >= the Mac OS version, or 0
+ * Return 1 if the Mac OS version is >= the given version number, or 0
  * otherwise.
  *
  * BUILD2_AUTOCONF_MACOS
