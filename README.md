@@ -39,7 +39,7 @@ using autoconf
 h{config}: in{config.h.cmake}
 ```
 
-The default falvor is `autoconf` but if the input file has the `.cmake` or
+The default flavor is `autoconf` but if the input file has the `.cmake` or
 `.meson` extension, then the `cmake` or `meson` flavors are selected
 automatically.  If, however, the standard `config.h.in` file is re-used for
 CMake/Meson, then the flavor must be specified explicitly with the
