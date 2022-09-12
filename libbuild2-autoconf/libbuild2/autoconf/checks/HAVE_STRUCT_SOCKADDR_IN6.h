@@ -6,9 +6,11 @@
 
 #undef HAVE_STRUCT_SOCKADDR_IN6
 
-/* Since OpenBSD ~4.2, FreeBSD ~7.0, NetBSD 2.1, Mac OS X 10.6, Windows
+/* Since glibc 2.1, OpenBSD ~4.2, FreeBSD ~7.0, NetBSD 2.1, Mac OS X 10.6,
+ * Windows
  */
-#if BUILD2_AUTOCONF_OPENBSD_PREREQ(200705)  || \
+#if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 1)      || \
+    BUILD2_AUTOCONF_OPENBSD_PREREQ(200705)  || \
     BUILD2_AUTOCONF_FREEBSD_PREREQ(7, 0)    || \
     BUILD2_AUTOCONF_NETBSD_PREREQ(2, 1)     || \
     BUILD2_AUTOCONF_MACOS_PREREQ(10, 6)     || \

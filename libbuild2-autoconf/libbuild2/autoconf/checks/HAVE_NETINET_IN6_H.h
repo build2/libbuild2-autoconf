@@ -6,11 +6,11 @@
 
 #undef HAVE_NETINET_IN6_H
 
-/* No decent info...
+/* On Linux the IPv6 constructs are defined in netinet/in.h and on FreeBSD
+ * netinet/in.h includes netinet6/in6.h (note: not netinet/) so the latter
+ * should not be included directly.
 */
-#if defined(__linux__)   || \
-    defined(__FreeBSD__) || \
-    defined(__OpenBSD__) || \
+#if defined(__OpenBSD__) || \
     defined(__NetBSD__)  || \
     defined(BUILD2_AUTOCONF_MACOS)
 #  define HAVE_NETINET_IN6_H 1
