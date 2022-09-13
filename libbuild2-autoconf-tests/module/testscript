@@ -498,3 +498,24 @@ cat config.h >>EOO
   #undef PREFIX_TEST_DUMMY3_H
   #define PREFIX_TEST_DUMMY3_H zzz_TEST_DUMMY3_H
   EOO
+
+: alias-map-prefix-same-name
+:
+mkdir build;
+ln -s ../../bootstrap.build ../../root.build build/;
+cat <<EOI >=config.h.cmake;
+  #cmakedefine PREFIX_zzz_TEST_DUMMY3_H
+  EOI
+$* <<EOI &config.h &config.h.d;
+  ./: h{config}: in{config.h.cmake}
+  {
+    autoconf.prefix = PREFIX_
+    autoconf.aliases = PREFIX_zzz_TEST_DUMMY3_H@zzz_TEST_DUMMY3_H
+  }
+  EOI
+cat config.h >>EOO
+  #define zzz_TEST_DUMMY3_H 1
+
+  #undef PREFIX_zzz_TEST_DUMMY3_H
+  #define PREFIX_zzz_TEST_DUMMY3_H zzz_TEST_DUMMY3_H
+  EOO

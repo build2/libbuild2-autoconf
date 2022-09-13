@@ -32,7 +32,7 @@ namespace build2
       autoconf::flavor    flavor;
       string              prefix;
       const alias_map*    aliases;
-      map<string, string> checks;   // Checks already seen.
+      set<string>         checks;   // Checks already seen.
 
       const autoconf::rule& rule;
 
@@ -499,13 +499,6 @@ namespace build2
         // 1. Suppress if a duplicate (we do it regardless of whether it is
         //    from the catalog or custom).
         //
-        //    Which name should we store, prefixed or prefixless? If we store
-        //    prefixed, then it won't be easy to match bases which are
-        //    specified without a prefix: we will have to add the prefix
-        //    unless the check is unprefixable, which we can only know by
-        //    looking it up. So we store prefixless. Actually, it's convenient
-        //    to store both.
-        //
         // 2. Check for a custom value falling through if found.
         //
         //    Here things get a bit tricky: while a stray HAVE_* buildfile
@@ -520,6 +513,16 @@ namespace build2
         // 3. Look in the catalog and fall through if not found.
         //
         // 4. Return the build-in value from the catalog.
+
+        // Note: this line must be recognizable by substitute_special().
+        //
+        if (md.checks.find (n) != md.checks.end ())
+          return "/* " + n + " already defined. */";
+
+        md.checks.insert (n);
+
+        // Note that if there is no prefix in the name, then we only look for
+        // an unprefixable built-in check.
         //
         auto deprefix = [&md] (const string& n) -> const char*
         {
@@ -535,18 +538,8 @@ namespace build2
             return n.c_str ();
         };
 
-        // Note that if there is no prefix in the name, then we only look for
-        // an unprefixable built-in check.
-        //
         const char* pn (deprefix (n));                    // Prefixless name.
         const char* en (pn != nullptr ? pn : n.c_str ()); // Effective name.
-
-        // Note: this line must be recognizable by substitute_special().
-        //
-        if (md.checks.find (en) != md.checks.end ())
-          return "/* " + n + " already defined. */";
-
-        md.checks.emplace (en, n);
 
         // If up is true, only look for an unprefixable check.
         //
@@ -664,23 +657,9 @@ namespace build2
             {
               string pn (bs, b, e - b); // Prefixless name.
 
-              // First supress duplicates.
+              // We have to look it up before suppressing duplicates to know
+              // whether it should be prefixed.
               //
-              {
-                auto i (md.checks.find (pn));
-                if (i != md.checks.end ())
-                {
-                  append (("/* Base " +
-                           i->second +
-                           " already defined. */").c_str ());
-
-                  if (pn != i->second)
-                    ns.push_back (move (pn));
-
-                  continue;
-                }
-              }
-
               const check* c (find (pn.c_str ()));
 
               // While it may be overridden by the user, we should also have
@@ -696,7 +675,19 @@ namespace build2
 
               string n ((up ? string () : md.prefix) + pn);
 
-              md.checks.emplace (pn, n);
+              // Supress duplicates.
+              //
+              if (md.checks.find (n) != md.checks.end ())
+              {
+                append (("/* Base " + n + " already defined. */").c_str ());
+
+                if (!up)
+                  ns.push_back (move (pn));
+
+                continue;
+              }
+
+              md.checks.insert (n);
 
               if (custom (n))
                 append (this->in::rule::lookup (
