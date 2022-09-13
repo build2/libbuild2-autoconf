@@ -6,13 +6,11 @@
 
 #undef HAVE_ARC4RANDOM_ADDRANDOM
 
-/* Since OpenBSD 2.1, FreeBSD 2.3, NetBSD 2.0, Mac OS X 10.7
- * and glibc 2.36.
+/* Since NetBSD 2.0.
+ *
+ * It was removed from OpenBSD in version 5.5 because it 'should not be called
+ * directly' so treat it as not present in any version.
  */
-#if BUILD2_AUTOCONF_OPENBSD_PREREQ(199706) || \
-    BUILD2_AUTOCONF_FREEBSD_PREREQ(2, 3)   || \
-    BUILD2_AUTOCONF_NETBSD_PREREQ(2, 0)    || \
-    BUILD2_AUTOCONF_MACOS_PREREQ(10, 7)    || \
-    BUILD2_AUTOCONF_GLIBC_PREREQ(2, 36)
+#if BUILD2_AUTOCONF_NETBSD_PREREQ(2, 0)
 #  define HAVE_ARC4RANDOM_ADDRANDOM 1
 #endif
