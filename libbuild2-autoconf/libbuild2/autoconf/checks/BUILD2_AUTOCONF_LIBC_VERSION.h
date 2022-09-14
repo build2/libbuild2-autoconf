@@ -99,8 +99,8 @@
  * __MINGW64__: Defined if on Mingw-w64, 64-bit only. This is a predefined
  *              macro so no header needs to be included.
  *
- * __MINGW64_MAJOR_VERSION:
- * __MINGW64_MINOR_VERSION: The Mingw-w64 major/minor version numbers. Note
+ * __MINGW64_VERSION_MAJOR:
+ * __MINGW64_VERSION_MINOR: The Mingw-w64 major/minor version numbers. Note
  *                          that these are defined for both 32 and 64-bit.
  */
 #if defined(__linux__)
@@ -115,7 +115,7 @@
 #elif defined(__APPLE__)
 #  include <Availability.h> /* __MAC_OS_X_VERSION_MIN_REQUIRED */
 #elif defined(__MINGW32__)
-#  include <_mingw.h> /* __MINGW64_{MAJOR,MINOR}_VERSION */
+#  include <_mingw.h> /* __MINGW64_VERSION_{MAJOR,MINOR} */
 #endif
 
 /* BUILD2_AUTOCONF_GLIBC_PREREQ(maj, min)
@@ -212,11 +212,11 @@
  * Return 1 if the Mingw-w64 version is >= the given version number, or 0
  * otherwise.
  */
-#if defined(__MINGW64_MAJOR_VERSION) && defined(__MINGW64_MINOR_VERSION)
+#if defined(__MINGW64_VERSION_MAJOR) && defined(__MINGW64_VERSION_MINOR)
 #  define BUILD2_AUTOCONF_MINGW_PREREQ(maj, min)  \
-            (__MINGW64_MAJOR_VERSION > (maj) ||   \
-             (__MINGW64_MAJOR_VERSION == (maj) && \
-              __MINGW64_MINOR_VERSION >= (min)))
+            (__MINGW64_VERSION_MAJOR > (maj) ||   \
+             (__MINGW64_VERSION_MAJOR == (maj) && \
+              __MINGW64_VERSION_MINOR >= (min)))
 #else
 #  define BUILD2_AUTOCONF_MINGW_PREREQ(maj, min) 0
 #endif
