@@ -14,6 +14,7 @@
  * BUILD2_AUTOCONF_OPENBSD_PREREQ(yyyymm)
  * BUILD2_AUTOCONF_NETBSD_PREREQ(maj, min)
  * BUILD2_AUTOCONF_MACOS_PREREQ(maj, min)
+ * BUILD2_AUTOCONF_MINGW_PREREQ(maj, min)
  *
  * Note that all of the above macros are always defined and evaluate to false
  * on platforms to which they do not apply. Which means that instead of:
@@ -31,6 +32,7 @@
  * #if defined(__FreeBSD__)
  * #if defined(__OpenBSD__)
  * #if defined(__NetBSD__)
+ * #if defined(__MINGW32__)
  *
  * Except for MacOS specifically, which we detect using our own macro (for
  * the sake of simplicity):
@@ -89,6 +91,17 @@
  *                                  formatted as `MMmmpp` where `mm` is the
  *                                  (now potentially double-digit) minor
  *                                  version and `pp` is the patch version.
+ *
+ * __MINGW32__: Defined if on original Mingw and on Mingw-w64, both 32 and
+ *              64-bit. This is a predefined macro so no header needs to be
+ *              included. Note that we don't really care about original Mingw.
+ *
+ * __MINGW64__: Defined if on Mingw-w64, 64-bit only. This is a predefined
+ *              macro so no header needs to be included.
+ *
+ * __MINGW64_MAJOR_VERSION:
+ * __MINGW64_MINOR_VERSION: The Mingw-w64 major/minor version numbers. Note
+ *                          that these are defined for both 32 and 64-bit.
  */
 #if defined(__linux__)
 #  include <features.h> /* __GLIBC__, __GLIBC_MINOR__, __GLIBC_PREREQ() */
@@ -101,6 +114,8 @@
 #  include <sys/param.h> /* OpenBSD, __NetBSD_Version__ */
 #elif defined(__APPLE__)
 #  include <Availability.h> /* __MAC_OS_X_VERSION_MIN_REQUIRED */
+#elif defined(__MINGW32__)
+#  include <_mingw.h> /* __MINGW64_{MAJOR,MINOR}_VERSION */
 #endif
 
 /* BUILD2_AUTOCONF_GLIBC_PREREQ(maj, min)
@@ -190,6 +205,20 @@
 #  undef BUILD2_AUTOCONF_MACOS
 
 #  define BUILD2_AUTOCONF_MACOS_PREREQ(maj, min) 0
+#endif
+
+/* BUILD2_AUTOCONF_MINGW_PREREQ(maj, min)
+ *
+ * Return 1 if the Mingw-w64 version is >= the given version number, or 0
+ * otherwise.
+ */
+#if defined(__MINGW64_MAJOR_VERSION) && defined(__MINGW64_MINOR_VERSION)
+#  define BUILD2_AUTOCONF_MINGW_PREREQ(maj, min)  \
+            (__MINGW64_MAJOR_VERSION > (maj) ||   \
+             (__MINGW64_MAJOR_VERSION == (maj) && \
+              __MINGW64_MINOR_VERSION >= (min)))
+#else
+#  define BUILD2_AUTOCONF_MINGW_PREREQ(maj, min) 0
 #endif
 
 #endif /* BUILD2_AUTOCONF_LIBC_VERSION */
