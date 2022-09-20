@@ -2,4 +2,4 @@
 
 #undef HAVE_SYS_POLL_H
 
-/* All use "poll.h": glibc, FreeBSD, OpenBSD, NetBSD, Mac OS. */
+/* All use poll.h: glibc, FreeBSD, OpenBSD, NetBSD, Mac OS. */
