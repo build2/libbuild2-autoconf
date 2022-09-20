@@ -7,7 +7,9 @@
 #undef HAVE_STRINGS_H
 
 /* Since 4.4BSD (OpenBSD 2.2, FreeBSD 1.0, NetBSD 1.3, Mac OS X 10.0),
- * glibc 2.0.
+ * glibc 2.0. Note that while MinGW also provides it, its contents
+ * could be omitted if the NO_OLDNAMES macro is defined. So let's
+ * exclude MinGW for now.
  */
 #if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 0)     || \
     BUILD2_AUTOCONF_FREEBSD_PREREQ(1, 0)   || \
