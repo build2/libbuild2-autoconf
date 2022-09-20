@@ -7,7 +7,7 @@
 #undef HAVE_INTTYPES_H
 
 /* Since OpenBSD 3.9, FreeBSD 5.0, NetBSD 5.0, Mac OS X 10.3
- * glibc 2.2, Mingw-w64 2.0
+ * glibc 2.2, Mingw-w64 2.0, Platform SDK 10.
  */
 #if BUILD2_AUTOCONF_OPENBSD_PREREQ(200601) || \
     BUILD2_AUTOCONF_FREEBSD_PREREQ(2, 3)   || \
@@ -15,6 +15,6 @@
     BUILD2_AUTOCONF_MACOS_PREREQ(10, 3)    || \
     BUILD2_AUTOCONF_GLIBC_PREREQ(2, 2)     || \
     BUILD2_AUTOCONF_MINGW_PREREQ(2, 0)     || \
-    defined(_WIN32)
+    defined(_MSC_VER)
 #  define HAVE_INTTYPES_H 1
 #endif
