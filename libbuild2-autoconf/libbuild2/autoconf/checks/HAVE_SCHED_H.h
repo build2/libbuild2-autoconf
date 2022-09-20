@@ -1,0 +1,17 @@
+// HAVE_SCHED_H : BUILD2_AUTOCONF_LIBC_VERSION
+
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
+#undef HAVE_SCHED_H
+
+/* Since glibc 2.0, FreeBSD 3.0, OpenBSD 4.9, NetBSD 5.0, Mac OS.
+ */
+#if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 0)     || \
+    BUILD2_AUTOCONF_FREEBSD_PREREQ(3, 0)   || \
+    BUILD2_AUTOCONF_OPENBSD_PREREQ(201105) || \
+    BUILD2_AUTOCONF_NETBSD_PREREQ(5, 0)    || \
+    defined(BUILD2_AUTOCONF_MACOS)
+#  define HAVE_SCHED_H 1
+#endif
