@@ -1,0 +1,17 @@
+// HAVE_STRERROR_R : BUILD2_AUTOCONF_LIBC_VERSION
+
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
+#undef HAVE_STRERROR_R
+
+/* Since glibc 2.3.4, FreeBSD 4.4, OpenBSD 3.3, NetBSD 4.0, Mac OS (from BSD)
+ */
+#if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 3)     || \
+    BUILD2_AUTOCONF_FREEBSD_PREREQ(4, 4)   || \
+    BUILD2_AUTOCONF_OPENBSD_PREREQ(200305) || \
+    BUILD2_AUTOCONF_NETBSD_PREREQ(4, 0)    || \
+    defined(BUILD2_AUTOCONF_MACOS)
+#  define HAVE_STRERROR_R 1
+#endif
