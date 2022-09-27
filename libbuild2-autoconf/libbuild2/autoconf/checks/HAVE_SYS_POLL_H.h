@@ -6,9 +6,14 @@
 
 #undef HAVE_SYS_POLL_H
 
-/* All use poll.h: FreeBSD, OpenBSD, NetBSD, Mac OS.
- * Since glibc 2.0.
+/* Since glibc 2.0.
+ * FreeBSD, OpenBSD, NetBSD, Mac OS: 
+ * All use poll.h though sys/poll.h still exists.
  */
-#if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 0)
+#if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 0) || \
+    defined(__FreeBSD__)               || \
+    defined(__OpenBSD__)               || \
+    defined(__NetBSD__)                || \
+    defined(BUILD2_AUTOCONF_MACOS)
 #  define HAVE_SYS_POLL_H 1
 #endif
