@@ -33,7 +33,10 @@ namespace build2
       // Enter variables.
       //
       {
-        auto& vp (rs.var_pool ());
+        // All the variables we enter are qualified so go straight for the
+        // public variable pool.
+        //
+        auto& vp (rs.var_pool (true /* public */));
 
         // Configuration file flavor. Valid values are `autoconf` (default),
         // `cmake`, and `meson`.
