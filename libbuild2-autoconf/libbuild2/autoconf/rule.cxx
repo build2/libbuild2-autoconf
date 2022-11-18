@@ -46,7 +46,7 @@ namespace build2
     rule::
     rule ()
         : in::rule ("autoconf.in 1",
-                    "autoconf.in",
+                    "autoconf",
                     '@'   /* symbol */,
                     false /* strict */)
     {
