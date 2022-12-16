@@ -19,12 +19,12 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
   backlink = true
 }
 {{
-  diag gen ($>[1])
+  diag gen $>
 
-  # We have to sort without the extension and as strings (to sort
+  # We have to sort input files without the extension and as strings (to sort
   # case-sensitively on Windows).
   #
-  i = $regex.apply($sort([strings] $base($path($<))), '(.+)', '\1.h')
+  is = $regex.apply($sort([strings] $base($path($<))), '(.+)', '\1.h')
 
   h = $path($>[0])
   s = $path($>[1])
@@ -32,7 +32,7 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
   # We regularize the output with a dummy start entry plus add five end
   # dummies that are used in tests.
   #
-  n = $size($<)
+  n = $size($is)
   n += 6
 
   cat <<"EOI" >$h
@@ -61,16 +61,54 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
   \"\", \"\", \"\",
 
   \"\"
+  },
   EOI
 
-  cat $i | sed -n \
-    -e 's|^// ([^ !:]+) *(!)? *(: *(( *[^ ]+)+))? *$|},\n\n{\n"\1", "\2", "\4",\n|p' \
-    -e 's|^(.*)\\$|"\1\\\\\\n"|p' \
-    -e 's|^(.*)$|"\1\\n"|p' \
-    - >>$s
+  for i: $is
+
+    # Split the contents of the file into lines.
+    #
+    cat $i | set --newline ls [strings]
+
+    # Extract the name (\1), modifier (\2) and base (\4) from the first line.
+    #
+    nmb = [strings] $regex.match($ls[0],                                     \
+                                 '// ([^ !:]+) *(!)? *(: *(( *[^ ]+)+))? *', \
+                                 return_subs)
+
+    if ($nmb == [null])
+      exit "incorrect first line format in $i"
+    end
+
+    # Note that if there is no modifier or base, we get empty strings.
+    #
+    cat <<"EOI" >>$s
+
+    {
+    "($nmb[0])", "($nmb[1])", "($nmb[3])",
+
+    EOI
+
+    # Filter out lines starting with // (including the first line).
+    #
+    # @@ Maybe we should get rid of the blank lines or at least collapse
+    #    multiple blank lines (which are bound to occur because we are now
+    #    removing some lines) into a single one?
+    #
+    ls = $regex.filter_out_match($ls, '\s*//.*')
+
+    # Merge and post-process the lines (handle line continuations and wrap in
+    # "...\n").
+    #
+    sed -n \
+      -e 's|^(.*)\\$|\1\\\\|' \
+      -e 's|^(.*)$|"\1\\n"|p' \
+      <<<"$regex.merge($ls, '(.*)', '\1', $\n, format_copy_empty)" >>$s
+
+    echo '},' >>$s
+  end
 
   cat <<EOI >>$s
-  },
 
   {
   "zzz_TEST_DUMMY1_H", "", "",
