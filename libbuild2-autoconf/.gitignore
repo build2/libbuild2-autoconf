@@ -12,6 +12,7 @@
 *.pcm
 *.ifc
 *.so
+*.dylib
 *.dll
 *.a
 *.lib
