@@ -1,6 +1,6 @@
 : 1
 name: libbuild2-autoconf
-version: 0.2.0
+version: 0.3.0-a.0.z
 project: build2
 summary: Autoconf emulation build system module for build2
 license: MIT ; MIT License.
