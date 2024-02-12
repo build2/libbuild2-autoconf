@@ -102,6 +102,14 @@ ln -s ../../bootstrap.build ../../root.build build/;
 cat <<EOI >=config.h.cmake;
   #define VERSION "@version@"
 
+  #cmakedefine01 TRUE01
+  #cmakedefine01 FALSE01
+  #cmakedefine01 ONE01
+  #cmakedefine01 ZERO01
+
+  #cmakedefine TRUE01
+  #cmakedefine FALSE01
+
   #cmakedefine TRUE
   #cmakedefine FALSE
   #cmakedefine ONE
@@ -131,6 +139,11 @@ cat <<EOI >=config.h.cmake;
 $* <<EOI &config.h &config.h.d;
   ./: h{config}: in{config.h.cmake}
   {
+    TRUE01  = true
+    FALSE01 = [bool] false
+    ONE01   = 1
+    ZERO01  = [uint64] 000
+
     TRUE  = true
     FALSE = [bool] false
     ONE   = 1
@@ -164,6 +177,14 @@ $* <<EOI &config.h &config.h.d;
   EOI
 cat config.h >>EOO
   #define VERSION "1.2.3"
+
+  #define TRUE01 1
+  #define FALSE01 0
+  #define ONE01 1
+  #define ZERO01 0
+
+  /* TRUE01 already defined. */
+  /* FALSE01 already defined. */
 
   #define TRUE 1
   #undef FALSE

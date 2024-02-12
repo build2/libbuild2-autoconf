@@ -177,7 +177,7 @@ namespace build2
 
       flavor f (t.data<match_data> (a).flavor);
 
-      // Substitute special #undef/#cmakedfine/#mesondefine line. If value is
+      // Substitute special #undef/#cmakedefine/#mesondefine line. If value is
       // false, then do not append the value to #define.
       //
       // Return true if it was substituted with #define, false if with #undef,
@@ -291,6 +291,41 @@ namespace build2
         return r;
       };
 
+      // Substitute special #cmakedefine01 line with #define 0 or 1.
+      //
+      auto substitute_special01 = [this,
+                                   &l,
+                                   a, &t,
+                                   &dd, &dd_skip,
+                                   strict, smap, &null,
+                                   &s] (const string& name)
+      {
+        // Essentially a simplified version of substitute_special() above.
+        //
+        optional<string> ov (substitute (l,
+                                         a, t,
+                                         dd, dd_skip,
+                                         name, 1 /* flags */,
+                                         strict, smap, null));
+
+        assert (ov);
+        string& v (*ov);
+
+        if (v == "0" || v == "1")
+          ;
+        else if (v == "false")
+          v = "0";
+        else if (v == "true")
+          v = "1";
+        else
+          fail (l) << "variable " << name << " should be false/0 or true/1";
+
+        s = "#define ";
+        s += name;
+        s += ' ';
+        s += v;
+      };
+
       // Deal with special lines of each flavor. Return if the line has has
       // been handled and fall through to use the normal substitution logic.
       //
@@ -378,9 +413,7 @@ namespace build2
           // #cmakedefine size_t @SIZE_T@
           //
           // The #cmakedefine01 variant is always replaced with #define,
-          // either with value 1 if NAME is true and 0 otherwise. It's doesn't
-          // appear to be used much in practice so we are not going to bother
-          // with it.
+          // either with value 1 if NAME is true and 0 otherwise.
           //
           skip_ws (s, i);
 
@@ -423,7 +456,26 @@ namespace build2
               s += *value;
             }
             else if (s.compare (i, 13, "cmakedefine01") == 0 && ws (s[i + 13]))
-              fail(l) << "#cmakedefine01 is not yet supported";
+            {
+              i += 13;
+              skip_ws (s, i);
+
+              size_t n (read_id (s, i));
+
+              if (n == 0)
+                fail (l) << "expected identifier after #cmakedefine01";
+
+              string name (s, i, n);
+
+              i += n;
+              skip_ws (s, i);
+
+              if (s[i] != '\0')
+                fail (l) << "junk after variable name in #cmakedefine01";
+
+              substitute_special01 (name);
+              return;
+            }
           }
           break;
         }
