@@ -5,7 +5,8 @@ GNU Autoconf emulation build system module for `build2`.
 Specifically, this module provides an [`in`][module-in]-based rule for
 processing `config.h.in` files. Besides the Autoconf special line flavor
 (`#undef`), it also supports the CMake (`#cmakedefine`, `#cmakedefine01`) and
-Meson (`#mesondefine`) variants.
+Meson (`#mesondefine`) variants. Note that the CMake `${VAR}` style
+substitutions are not supported, only the `@VAR@` style.
 
 Similar to Autoconf, this module provides built-in support for a number of
 common `HAVE_*` configuration options. However, the values of these options
