@@ -16,6 +16,6 @@
     BUILD2_AUTOCONF_MINGW_PREREQ(1, 0) || \
     defined(_WIN32) || \
     defined(BUILD2_AUTOCONF_MACOS) || \
-    (defined(__sun) && defined(__SVR4))
+    ((defined(__sun) && defined(__SVR4)) || defined(__sun__))
 #  define HAVE_COPYSIGNF 1
 #endif
