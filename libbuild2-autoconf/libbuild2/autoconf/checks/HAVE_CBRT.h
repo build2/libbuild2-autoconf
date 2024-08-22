@@ -8,7 +8,8 @@
     BUILD2_AUTOCONF_FREEBSD_PREREQ(2, 0)  || \
     BUILD2_AUTOCONF_OPENBSD_PREREQ(199706) || \
     BUILD2_AUTOCONF_NETBSD_PREREQ(1, 3) || \
-    defined(_WIN32)
+    defined(_WIN32) || \
+    defined(__MINGW32__)
 #  define HAVE_CBRT 1
 #endif
 
