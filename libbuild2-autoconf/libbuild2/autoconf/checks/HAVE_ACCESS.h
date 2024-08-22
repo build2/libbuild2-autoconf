@@ -13,8 +13,8 @@
     BUILD2_AUTOCONF_FREEBSD_PREREQ(1, 0)  || \
     BUILD2_AUTOCONF_OPENBSD_PREREQ(199518) || \
     BUILD2_AUTOCONF_NETBSD_PREREQ(1, 0) || \
-    BUILD2_AUTOCONF_MINGW_PREREQ(2, 0) \
+    BUILD2_AUTOCONF_MINGW_PREREQ(2, 0) || \
     defined(BUILD2_AUTOCONF_MACOS) || \
-    ((defined(__sun) && defined(__SVR4))
+    (defined(__sun) && defined(__SVR4))
 #  define HAVE_ACCESS 1
 #endif
