@@ -5,6 +5,6 @@
 /* AFAICS this is exclusively a Risc-V thing.
  */
 
-#if defined(__riscv)
+#if defined(__riscv__) || defined(__riscv)
 #  define HAVE_ASM_HWPROBE_H 1
 #endif

@@ -2,7 +2,7 @@
 
 #undef HAVE_DEV_IC_BT8XX_H
 
-/* OpenBSD 2.3, FreeBSD 2.2, glibc 2.19, Windows, Solaris
+/* OpenBSD 2.3, FreeBSD 2.2, glibc 2.19, NetBSD 1.5
  */
 #if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 19) || \
     BUILD2_AUTOCONF_FREEBSD_PREREQ(2, 2) || \
