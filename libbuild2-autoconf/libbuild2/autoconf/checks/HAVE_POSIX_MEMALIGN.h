@@ -1,0 +1,17 @@
+// HAVE_POSIX_MEMALIGN : BUILD2_AUTOCONF_LIBC_VERSION
+
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
+#undef HAVE_POSIX_MEMALIGN
+
+/* Presence of memalign() function.
+ * Since FreeBSD 7.0, OpenBSD 5.5, NetBSD 3.0, MacOS 10.6
+ */
+#if BUILD2_AUTOCONF_FREEBSD_PREREQ(7, 0) || \
+    BUILD2_AUTOCONF_OPENBSD_PREREQ(201405) || \
+    BUILD2_AUTOCONF_NETBSD_PREREQ(3, 0) || \
+    BUILD2_AUTOCONF_MACOS_PREREQ(10, 6)
+#  define HAVE_POSIX_MEMALIGN 1
+#endif
