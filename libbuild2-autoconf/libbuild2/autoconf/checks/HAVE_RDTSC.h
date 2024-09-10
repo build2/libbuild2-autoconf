@@ -7,6 +7,6 @@
  * Since glibc 2.0 (x86), FreeBSD (x86), OpenBSD (x86), NetBSD (x86),
  * MacOS 10.04 (x86)
  */
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(__i386__)
 #  define HAVE_RDTSC 1
 #endif
