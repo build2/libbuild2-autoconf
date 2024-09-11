@@ -15,7 +15,6 @@
     BUILD2_AUTOCONF_NETBSD_PREREQ(1, 2) || \
     BUILD2_AUTOCONF_MINGW_PREREQ(2, 0) || \
     BUILD2_AUTOCONF_MACOS_PREREQ(10, 0) || \
-    defined(_WIN32) || \
     ((defined(__sun) && defined(__SVR4)) || defined(__sun__))
 #  define HAVE_LOCALTIME_R 1
 #endif
