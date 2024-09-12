@@ -5,7 +5,7 @@
 /* Presence of malloc.h.
  * Supported on Linux (deprecated since glibc 2.0), Windows * Mingw
  */
-#if (defined(__GLIBC__) && __GLIBC__ < 2) || \
+#if defined(__GLIBC__) || \
     defined(_WIN32) || \
     defined(__MINGW32__)
 #  define HAVE_MALLOC_H 1
