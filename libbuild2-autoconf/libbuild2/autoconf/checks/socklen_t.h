@@ -16,10 +16,11 @@
       defined(__FreeBSD__)                || \
       defined(__OpenBSD__)                || \
       defined(__NetBSD__)                 || \
-      defined(__APPLE__)                  || \
       (defined(__sun) && defined(__SVR4)) || \
       defined(__CYGWIN__)
+
 #     include <sys/socket.h>
+
       /* If available, we do nothing. */
 #  elif defined(_WIN32)
       /* While socklen_t is declared in <ws2tcpip.h>, including this header is

@@ -9,6 +9,7 @@
     BUILD2_AUTOCONF_FREEBSD_PREREQ(2, 0)  || \
     BUILD2_AUTOCONF_OPENBSD_PREREQ(199706) || \
     BUILD2_AUTOCONF_NETBSD_PREREQ(1, 3) || \
+    BUILD2_AUTOCONF_MACOS_PREREQ(10, 0) || \
     defined(_WIN32) || \
     defined(__MINGW32__) || \
     ((defined(__sun) && defined(__SVR4)) || defined(__sun__))

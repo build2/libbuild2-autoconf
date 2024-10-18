@@ -9,6 +9,7 @@
     BUILD2_AUTOCONF_FREEBSD_PREREQ(1, 0) || \
     BUILD2_AUTOCONF_OPENBSD_PREREQ(199105) || \
     BUILD2_AUTOCONF_NETBSD_PREREQ(1, 3) || \
+    BUILD2_AUTOCONF_MACOS_PREREQ(10, 0) || \
     ((defined(__sun) && defined(__SVR4)) || defined(__sun__))
 #  define HAVE_GETOPT 1
 #endif
