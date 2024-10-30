@@ -4,7 +4,10 @@
 
 /* Platforms and compilers supporting efficient unaligned memory access.
  */
-#if defined(__x86_64__) || defined(__i386__)  /* x86 and x86-64 (Intel and AMD) */
+
+/* x86 and x86-64 (Intel and AMD) */
+#if defined(__x86_64__) || defined(__i386__) || \
+           defined(_M_IX86) || defined(_M_X64)
 /* x86 and x86-64 platforms have efficient unaligned memory access */
 #  define HAVE_FAST_UNALIGNED 1
 #elif defined(__ARM_ARCH) && (__ARM_ARCH >= 7) /* ARMv7-A or later */

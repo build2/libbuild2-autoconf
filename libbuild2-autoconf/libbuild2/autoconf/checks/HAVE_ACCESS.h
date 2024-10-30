@@ -15,6 +15,7 @@
     BUILD2_AUTOCONF_NETBSD_PREREQ(1, 0) || \
     BUILD2_AUTOCONF_MINGW_PREREQ(2, 0) || \
     defined(BUILD2_AUTOCONF_MACOS) || \
-    (defined(__sun) && defined(__SVR4))
+    (defined(__sun) && defined(__SVR4)) || \
+    defined(_WIN32)
 #  define HAVE_ACCESS 1
 #endif
