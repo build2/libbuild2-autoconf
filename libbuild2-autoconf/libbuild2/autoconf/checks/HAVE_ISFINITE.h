@@ -6,7 +6,8 @@
 
 #undef HAVE_ISFINITE
 
-/* Since Linux/glibc 2.0, FreeBSD 5.1, OpenBSD 4.4, NetBSD 1.3, Mac OS, Solaris
+/* Since Linux/glibc 2.0, FreeBSD 5.1, OpenBSD 4.4, NetBSD 1.3, Mac OS, Solaris,
+ * MingW
  */
 #if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 0)     || \
     BUILD2_AUTOCONF_FREEBSD_PREREQ(5, 1)   || \
@@ -16,6 +17,7 @@
     BUILD2_AUTOCONF_MINGW_PREREQ(1, 0)     || \
     defined(BUILD2_AUTOCONF_MACOS)         || \
     defined(_WIN32)                        || \
+    defined(__MINGW32__)                   || \
     ((defined(__sun) && defined(__SVR4)) || defined(__sun__))
 #  define HAVE_ISFINITE 1
 #endif

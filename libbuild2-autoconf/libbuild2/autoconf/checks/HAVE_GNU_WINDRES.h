@@ -6,5 +6,5 @@
  * where it's used to compile Windows resource files (.rc).
  */
 #if defined(__MSYS__) || defined(__MINGW32__) || defined(__MINGW64__) || defined(__CYGWIN__)
-    #define HAVE_GNU_WINDRES 1
+#  define HAVE_GNU_WINDRES 1
 #endif
