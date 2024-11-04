@@ -12,6 +12,4 @@
     !defined(__powerpc__) && !defined(__ppc__) && \
     !defined(__mips__) && !defined(__riscv)
     #define HAVE_ASM_EBX 1
-#else
-    #define HAVE_ASM_EBX 0
 #endif
