@@ -20,6 +20,4 @@
     BUILD2_AUTOCONF_GLIBC_PREREQ(2, 0)     || \
     defined(_WIN32)
 #  define HAVE_SLEEP 1
-#else
-#  define HAVE_SLEEP 0
 #endif
