@@ -8,9 +8,8 @@
  * This function is specific to Microsoft environments and is only
  * available on 64-bit architectures (x86_64).
  */
-#if (defined(_WIN32) && defined(_M_X64)) || \
-    (defined(__MINGW32__) && defined(__x86_64__)) || \
-    (defined(__CYGWIN__) && defined(__x86_64__))
+#if defined(_WIN32) && \
+    (defined(__x86_64__) || defined(_M_X64) || defined(_M_ARM64))
 #  include <intrin.h>
 #  define HAVE__BITSCANREVERSE64 1
 #endif

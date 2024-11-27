@@ -8,7 +8,8 @@
  * This is a Microsoft-specific function available on Windows
  * platforms and some compatible compilers like MinGW.
  */
-#if (defined(_WIN32) || defined(__MINGW32__)) && \
-    (defined(_M_IX86) || defined(_M_X64))
+#if defined(_WIN32) && \
+    (defined(__i386__) || defined(_M_IX86)  || defined(_M_ARM) || \
+     defined(__x86_64__) || defined(_M_X64) || defined(_M_ARM64))
 #  define HAVE__BITSCANREVERSE 1
 #endif
