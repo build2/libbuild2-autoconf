@@ -10,11 +10,12 @@
  * glibc 2.2, Mingw-w64 2.0, Platform SDK 10.
  */
 #if BUILD2_AUTOCONF_OPENBSD_PREREQ(200601) || \
-    BUILD2_AUTOCONF_FREEBSD_PREREQ(2, 3)   || \
+    BUILD2_AUTOCONF_FREEBSD_PREREQ(5, 0)   || \
     BUILD2_AUTOCONF_NETBSD_PREREQ(5, 0)    || \
     BUILD2_AUTOCONF_MACOS_PREREQ(10, 3)    || \
     BUILD2_AUTOCONF_GLIBC_PREREQ(2, 2)     || \
     BUILD2_AUTOCONF_MINGW_PREREQ(2, 0)     || \
-    defined(_MSC_VER)
+    defined(_WIN32) || \
+    defined(__CYGWIN__)
 #  define HAVE_INTTYPES_H 1
 #endif
