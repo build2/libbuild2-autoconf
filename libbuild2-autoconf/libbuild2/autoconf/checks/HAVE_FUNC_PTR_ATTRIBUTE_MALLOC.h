@@ -6,6 +6,7 @@
  * function pointers, indicating the return value is a
  * pointer to newly allocated memory.
  */
-#if defined(__GNUC__) || defined(__clang__)
-#  define HAVE_FUNC_ATPTR_ATTRIBUTE_MALLOC
+#if (defined(__GNUC__) && (__GNUC__ >= 3)) || \
+    (!defined(_MSC_VER) && defined(__clang__) && (__clang_major__ >= 3))
+#  define HAVE_FUNC_PTR_ATTRIBUTE_MALLOC 1
 #endif
