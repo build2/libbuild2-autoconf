@@ -10,7 +10,7 @@
  * based on a constant condition, evaluated at compile time.
  */
 #if ((defined(__GNUC__) && (__GNUC__ >= 3)) || \
-     (defined(__clang__) && __has_builtin(__builtin_choose_expr))) && \
-    (!defined(_WIN32))
+     (defined(__clang__) && (__clang_major__ >= 3))) && \
+    !defined(_WIN32)
 #  define HAVE___BUILTIN_CHOOSE_EXPR 1
 #endif

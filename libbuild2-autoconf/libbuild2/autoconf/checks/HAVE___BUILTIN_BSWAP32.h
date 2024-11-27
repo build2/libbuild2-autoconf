@@ -10,7 +10,7 @@
  * headers on other platforms.
  */
 #if ((defined(__GNUC__) && (__GNUC__ >= 5)) || \
-     (defined(__clang__) && __has_builtin(__builtin_bswap32))) && \
-    (!defined(_WIN32))
+     (defined(__clang__) && (__clang_major__ >= 3))) && \
+    !defined(_WIN32)
 #  define HAVE___BUILTIN_BSWAP32 1
 #endif
