@@ -5,6 +5,7 @@
 /* Checks if the compiler supports the cold attribute,
  * which marks a function as unlikely to be executed.
  */
-#if defined(__GNUC__) || defined(__clang__)
+#if (defined(__GNUC__) && (__GNUC__ >= 4)) || \
+    (!defined(_MSC_VER) && defined(__clang__) && (__clang_major__ >= 3))
 #  define HAVE_FUNC_ATTRIBUTE_COLD 1
 #endif
