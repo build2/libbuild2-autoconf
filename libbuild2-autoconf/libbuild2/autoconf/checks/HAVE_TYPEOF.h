@@ -10,4 +10,7 @@
 #if (defined(__GNUC__) && (__GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 5))) || \
     (!defined(_MSC_VER) && defined(__clang__) && (__clang_major__ >= 3))
 #  define HAVE_TYPEOF 1
+#  ifdef __APPLE__
+#  define typeof __typeof__
+#  endif
 #endif
