@@ -12,6 +12,8 @@
     defined(__OpenBSD__)            || \
     defined(__NetBSD__)             || \
     defined(BUILD2_AUTOCONF_MACOS)  || \
-    defined(_WIN32)
+    defined(_WIN32) || \
+    defined(__MINGW32__) || \
+    defined(__CYGWIN__)
 #  define HAVE_SYS_STAT_H 1
 #endif
