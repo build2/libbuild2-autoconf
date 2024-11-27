@@ -12,6 +12,7 @@
     defined(__FreeBSD__) || \
     defined(__NetBSD__) || \
     defined(__OpenBSD__) || \
-    defined(_WIN32)
+    defined(__MINGW32__) || \
+    defined(__CYGWIN__)
 #  define HAVE_S_ISREG 1
 #endif
