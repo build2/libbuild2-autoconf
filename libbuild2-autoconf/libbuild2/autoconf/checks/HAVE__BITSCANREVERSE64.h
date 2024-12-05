@@ -10,6 +10,5 @@
  */
 #if defined(_WIN32) && \
     (defined(__x86_64__) || defined(_M_X64) || defined(_M_ARM64))
-#  include <intrin.h>
 #  define HAVE__BITSCANREVERSE64 1
 #endif
