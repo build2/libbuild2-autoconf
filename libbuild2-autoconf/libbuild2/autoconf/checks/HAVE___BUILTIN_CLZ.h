@@ -11,7 +11,6 @@
  * hardware that supports efficient bit manipulation.
  */
 #if ((defined(__GNUC__) && (__GNUC__ >= 3)) || \
-     (defined(__clang__) && (__clang_major__ >= 3))) && \
-    !defined(_WIN32)
+     (defined(__clang__) && (__clang_major__ >= 3)))
 #  define HAVE___BUILTIN_CLZ 1
 #endif
