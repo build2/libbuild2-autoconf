@@ -28,7 +28,7 @@
        * this is a simple int typedef and so just doing that feels like the
        * simplest (if hackish) way to sidestep the whole mess.
        */
-      typedef int socklen_t;
+#     define socklen_t int
 #  else
       /* Else define it to unsigned int (suggested fallback by libevent). */
 #     define socklen_t unsigned int
