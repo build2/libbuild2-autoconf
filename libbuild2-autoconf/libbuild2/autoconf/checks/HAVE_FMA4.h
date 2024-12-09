@@ -6,6 +6,7 @@
  *
  * MSVC: /arch:AVX2
  */
-#ifdef __FMA4__
+#if defined(__FMA4__) || \
+    (defined(_WIN32) && defined(__AVX2__))
 #  define HAVE_FMA4 1
 #endif

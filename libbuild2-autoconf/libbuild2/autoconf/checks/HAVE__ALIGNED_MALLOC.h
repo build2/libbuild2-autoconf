@@ -7,4 +7,3 @@
 #if defined(_WIN32)
 #  define HAVE__ALIGNED_MALLOC 1
 #endif
-
