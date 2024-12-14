@@ -6,8 +6,17 @@
 
 #undef HAVE_LSTAT
 
-/* Since glibc 2.19.
+/* 
+ * lstat() is available in:
+ * - glibc since 2.19
+ * - BSD systems (including MacOS)
+ * - Solaris
  */
-#if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 19)
+#if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 19) || \
+    BUILD2_AUTOCONF_FREEBSD_PREREQ(1, 0) || \
+    BUILD2_AUTOCONF_OPENBSD_PREREQ(199510) || \
+    BUILD2_AUTOCONF_NETBSD_PREREQ(1, 3) || \
+    BUILD2_AUTOCONF_MACOS_PREREQ(10, 0) || \
+    ((defined(__sun) && defined(__SVR4)) || defined(__sun__))
 #  define HAVE_LSTAT 1
 #endif
