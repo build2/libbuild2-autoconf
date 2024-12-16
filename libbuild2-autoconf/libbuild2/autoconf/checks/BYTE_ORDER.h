@@ -41,11 +41,6 @@
 #      define BYTE_ORDER    __DARWIN_BYTE_ORDER
 #      define BIG_ENDIAN    __DARWIN_BIG_ENDIAN
 #      define LITTLE_ENDIAN __DARWIN_LITTLE_ENDIAN
-#    else
-       // If for some reason __DARWIN_BYTE_ORDER isn't defined, we can assume:
-#      define BYTE_ORDER    __LITTLE_ENDIAN  // macOS uses little-endian
-#      define BIG_ENDIAN    4321
-#      define LITTLE_ENDIAN 1234
 #    endif
 #  elif defined(_WIN32)
 #    define BIG_ENDIAN    4321
