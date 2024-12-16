@@ -6,7 +6,7 @@
 
 #undef HAVE_INTTYPES_H
 
-/* Since OpenBSD 3.9, FreeBSD 5.0, NetBSD 5.0, Mac OS X 10.3
+/* Since OpenBSD 3.9, FreeBSD 5.0, NetBSD 5.0, Mac OS X 10.3,
  * glibc 2.2, Mingw-w64 2.0, Platform SDK 10.
  */
 #if BUILD2_AUTOCONF_OPENBSD_PREREQ(200601) || \
