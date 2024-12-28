@@ -13,6 +13,8 @@
     defined(__OpenBSD__)                || \
     defined(__NetBSD__)                 || \
     defined(BUILD2_AUTOCONF_MACOS)      || \
-    defined(_WIN32)
+    defined(_WIN32) || \
+    defined(__MINGW32__) || \
+    defined(__CYGWIN__)
 #  define HAVE_STRUCT_SOCKADDR_STORAGE 1
 #endif

@@ -8,14 +8,17 @@
 
 /* Presence of the pollfd structure, used for the poll() system call,
  * which monitors multiple file descriptors.
- * Since glibc 2.0, FreeBSD 3.0, OpenBSD 2.0, NetBSD 1.3, MacOS 10
- * Solaris 2.6
+ * Since glibc 2.0, FreeBSD 3.0, OpenBSD 2.0, NetBSD 1.3, MacOS 10,
+ * Windows (winsock2.h) & Solaris 2.6
  */
 #if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 0)    || \
     BUILD2_AUTOCONF_FREEBSD_PREREQ(3, 0)  || \
     BUILD2_AUTOCONF_OPENBSD_PREREQ(199610) || \
     BUILD2_AUTOCONF_NETBSD_PREREQ(1, 3) || \
     BUILD2_AUTOCONF_MACOS_PREREQ(10, 0) || \
+    defined(_WIN32) || \
+    defined(__MINGW32__) || \
+    defined(__CYGWIN__) || \
     ((defined(__sun) && defined(__SVR4)) || defined(__sun__))
 #  define HAVE_STRUCT_POLLFD 1
 #endif

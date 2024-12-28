@@ -15,6 +15,8 @@
     BUILD2_AUTOCONF_OPENBSD_PREREQ(200112) || \
     BUILD2_AUTOCONF_NETBSD_PREREQ(1, 5) || \
     BUILD2_AUTOCONF_MACOS_PREREQ(10, 0) || \
-    defined(_WIN32)
+    defined(_WIN32) || \
+    defined(__MINGW32__) || \
+    defined(__CYGWIN__)
 #  define HAVE_STRUCT_IPV6_MREQ 1
 #endif

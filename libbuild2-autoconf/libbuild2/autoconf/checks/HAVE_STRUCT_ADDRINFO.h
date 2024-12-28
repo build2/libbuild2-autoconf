@@ -16,6 +16,8 @@
     BUILD2_AUTOCONF_FREEBSD_PREREQ(3, 5)    || \
     BUILD2_AUTOCONF_NETBSD_PREREQ(1, 5)     || \
     defined(BUILD2_AUTOCONF_MACOS)          || \
-    defined(_WIN32)
+    defined(_WIN32) || \
+    defined(__MINGW32__) || \
+    defined(__CYGWIN__)
 #  define HAVE_STRUCT_ADDRINFO 1
 #endif
