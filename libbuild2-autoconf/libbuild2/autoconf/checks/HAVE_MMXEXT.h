@@ -1,13 +1,12 @@
-// HAVE_MMXEXT
+// HAVE_MMXEXT : HAVE_X86ASM
 
 #undef HAVE_MMXEXT
 
-/* Presence of MMXEXT instructions, which are extensions to the original
- * MMX instruction set, available on AMD processors starting from K6-2.
- * Since glibc 2.0 (x86), FreeBSD (x86), OpenBSD (x86), NetBSD (x86),
- * MacOS 10.04 (x86), MSVC
+/* Presence of MMXEXT instructions:
+ * - Checks for explicit __MMXEXT__ definition first
+ * - Falls back to compiler-specific checks for likely MMXEXT support
  */
 #if defined(__MMXEXT__) || \
-    defined(_M_IX86) || defined(_M_X64)
+    defined(HAVE_X86ASM)
 #  define HAVE_MMXEXT 1
 #endif
