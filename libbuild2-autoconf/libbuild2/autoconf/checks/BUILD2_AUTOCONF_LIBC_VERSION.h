@@ -113,6 +113,10 @@
  */
 #  include <sys/param.h> /* OpenBSD, __NetBSD_Version__ */
 #elif defined(__APPLE__)
+// Note: In newer versions apple internally use __has_extension & __has_buildin
+//       without including the (required) header <sys/cdefs.h>.
+//       This is specifically a problem with GCC, so lets include it first.
+#  include <sys/cdefs.h>
 #  include <Availability.h> /* __MAC_OS_X_VERSION_MIN_REQUIRED */
 #elif defined(__MINGW32__)
 #  include <_mingw.h> /* __MINGW64_VERSION_{MAJOR,MINOR} */
