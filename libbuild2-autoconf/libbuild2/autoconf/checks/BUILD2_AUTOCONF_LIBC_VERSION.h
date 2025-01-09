@@ -113,6 +113,12 @@
  */
 #  include <sys/param.h> /* OpenBSD, __NetBSD_Version__ */
 #elif defined(__APPLE__)
+/* Note: some Apple headers use macros like __has_extension and __has_buildin
+ * without checking whether they are defined. This causes issues with GCC
+ * which does not provide them yet (see GCC bug 90835). It happens that the
+ * <sys/cdefs.h> header provides the necessary fallbacks.
+ */
+#  include <sys/cdefs.h>
 #  include <Availability.h> /* __MAC_OS_X_VERSION_MIN_REQUIRED */
 #elif defined(__MINGW32__)
 #  include <_mingw.h> /* __MINGW64_VERSION_{MAJOR,MINOR} */
