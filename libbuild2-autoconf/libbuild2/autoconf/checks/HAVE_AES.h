@@ -3,17 +3,19 @@
 #undef HAVE_AES
 
 /* GCC, Clang: -maes
- *
- * MSVC: No controlling compiler option nor indicating macro. The
- *       documentation murkily says it's always enabled on Intel and only
- *       Intel processors; see:
- *       https://docs.microsoft.com/en-us/cpp/intrinsics/x86-intrinsics-list
- *       https://docs.microsoft.com/en-us/cpp/intrinsics/x64-amd64-intrinsics-list)
- *
- * The AES-NI instructions which are widely supported in CPUs (since 2009 for
- * Intel; also `latest` ARM and SPARC processors) and most modern compilers
- * (according to Wikipedia). First added to GCC 4.4.7 (2012).
+ * Checks for native AES support provided by the operating system.
+ * - Windows: Supported via Cryptography API: Next Generation (CNG).
+ * - macOS: Supported via CommonCrypto.
+ * - BSD (OpenBSD, FreeBSD, NetBSD): Native support via system libraries.
+ * - Linux: No native AES API; often relies on third-party libraries.
+ * Excludes third-party libraries (e.g., OpenSSL).
  */
-#ifdef __AES__
+
+#if defined(__AES__) || \
+    defined(__FreeBSD__) || \
+    defined(__NetBSD__) || \
+    defined(__OpenBSD__) || \
+    (defined(_WIN32) && !defined(__CYGWIN__)) || \
+    (defined(__APPLE__) && defined(__MACH__))
 #  define HAVE_AES 1
 #endif
