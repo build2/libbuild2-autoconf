@@ -2,13 +2,21 @@
 
 #undef HAVE_UDPLITE_H
 
-/* Presence of udplite.h, used for UDP-Lite protocol, which offers
- * partial error checking for better performance in lossy networks.
- * Since Linux kernel 2.6.20 (2007)
+/* Check for udplite.h, introduced for UDP-Lite (partial checksum
+ * functionality for lossy networks). Supported since Linux 2.6.20.
  */
 #ifdef __linux__
 #  include <linux/version.h>
 #  if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,20)
-#    define HAVE_UDPLITE_H 1
+     /* udplite.h isn't always available even though it's functionality
+      * is supported
+      */
+#    if defined(__has_include) && __has_include(<udplite.h>)
+#      define HAVE_UDPLITE_H 1
+#    else
+       /* udplite.h is missing despite kernel support; define constants manually. */
+#      define UDPLITE_SEND_CSCOV 10
+#      define UDPLITE_RECV_CSCOV 11
+#    endif
 #  endif
 #endif
