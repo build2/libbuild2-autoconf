@@ -1,6 +1,6 @@
 : 1
 name: libbuild2-autoconf-tests
-version: 0.3.0
+version: 0.4.0-a.0.z
 project: build2
 summary: Tests for the Autoconf emulation build system module for build2
 license: MIT ; MIT License.
