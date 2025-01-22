@@ -696,7 +696,7 @@ namespace build2
               // We have to look it up before suppressing duplicates to know
               // whether it should be prefixed.
               //
-              optional<check> c (find_check (pn));
+              optional<check> c (this->find_check (pn)); // GCC 4.9
 
               // While it may be overridden by the user, we should also have
               // an entry in the builtin or project catalog (where we get the
