@@ -6,16 +6,19 @@ Specifically, this module provides an [`in`][module-in]-based rule for
 processing `config.h.in` files. Besides the Autoconf special line flavor
 (`#undef`), it also supports the CMake (`#cmakedefine`, `#cmakedefine01`) and
 Meson (`#mesondefine`) variants. Note that the CMake `${VAR}` style
-substitutions are not supported, only the `@VAR@` style.
+substitutions are not supported, only the `@VAR@` style (see
+[Modifying upstream source code during build][pkg-guide-modify-upstream]
+for one way to deal with `${VAR}`).
 
-Similar to Autoconf, this module provides built-in support for a number of
-common `HAVE_*` configuration options. However, the values of these options
-are not discovered by dynamic probing, such as trying to compile a test
-program to check if the feature is present. Instead, they are set to static
-expected values based on the platform/compiler macro checks (see note at the
-beginning of [Project Configuration][proj-config] for rationale).
+Similar to Autoconf, this module provides builtin support for a number of
+common `HAVE_*` configuration checks with projects being able to add custom
+ones. However, the values of these checks are not discovered by dynamic
+probing, such as trying to compile a test program to determine if the feature
+is present. Instead, they are set to static expected values based on the
+platform/compiler macro checks (see note at the beginning of [Project
+Configuration][proj-config] for rationale).
 
-See [`libbuild2/autoconf/checks/`][checks] for the list of available built-in
+See [`libbuild2/autoconf/checks/`][checks] for the list of available builtin
 checks. Submit requests for new checks as issues. Submit implementations of
 new checks (or any other improvements) as PRs or patches.
 
@@ -55,9 +58,9 @@ h{config}: in{config}
 }
 ```
 
-Besides the built-in configuration options, custom substitutions can be
-specified as `buildfile` variables or key-value pairs in the same way as with
-the [`in`][module-in] module. For example, as `buildfile` variables:
+Besides the configuration checks, custom substitutions can be specified as
+`buildfile` variables or key-value pairs in the same way as with the
+[`in`][module-in] module. For example, as `buildfile` variables:
 
 ```
 /* config.h.in */
@@ -104,8 +107,7 @@ substitutions that cannot be specified as `buildfile` variables because they
 start with an underscore (and thus are reserved, as in the above example) or
 refer to one of the predefined variables.
 
-The custom substitutions can also be used to override the built-in checks, for
-example:
+The custom substitutions can also be used to override the checks, for example:
 
 ```
 h{config}: in{config}
@@ -116,9 +118,9 @@ h{config}: in{config}
 
 While this module provides widely used aliases for some checks, it doesn't
 attempt to cover every project's idiosyncrasies. Instead, it provides a
-mechanism for creating project-specific aliases for built-in
-checks. Specifically, the desired aliases can be specified as key-value pairs
-in the `autoconf.aliases` map with the key being the new name and the value --
+mechanism for creating project-specific aliases for builtin checks.
+Specifically, the desired aliases can be specified as key-value pairs in the
+`autoconf.aliases` map with the key being the new name and the value --
 old/existing. For example:
 
 ```
@@ -136,11 +138,11 @@ h{config}: in{config}
 }
 ```
 
-The built-in checks can be prefixed in order to avoid clashes with similarly
-named macros in other headers. This is an especially good idea if the
-resulting header is public. To enable this, we specify the prefix with
-the `autoconf.prefix` variable and then use the prefixed versions of
-the options in the `config.h.in` file. For example:
+The checks can be prefixed in order to avoid clashes with similarly named
+macros in other headers. This is an especially good idea if the resulting
+header is public. To enable this, we specify the prefix with the
+`autoconf.prefix` variable and then use the prefixed versions of the checks in
+the `config.h.in` file. For example:
 
 ```
 /* config.h.in */
@@ -156,10 +158,10 @@ h{config}: in{config}
 }
 ```
 
-Note that `autoconf.prefix` only affects the lookup of the built-in checks.
-Custom substitutions and overrides of built-in checks must include the
-prefix. Similarly, both names in `autoconf.aliases` must be specified
-with the prefix (unless unprefixable; see below). For example:
+Note that `autoconf.prefix` only affects the lookup of the checks in the
+catalogs (project and builtin). Custom substitutions and overrides of checks
+must include the prefix. Similarly, both names in `autoconf.aliases` must be
+specified with the prefix (unless unprefixable; see below). For example:
 
 ```
 h{config}: in{config}
@@ -172,11 +174,11 @@ h{config}: in{config}
 }
 ```
 
-Note also that some built-in check names are *unprefixable*, usually because
-they are standard macro names (for example, `BYTE_ORDER`) that on some
-platforms come from system headers (for example, `<sys/endian.h>` on FreeBSD).
-Such checks have `!` after their names on the first line of their
-implementation files (for example, `// BYTE_ORDER!`).
+Note also that some check names are *unprefixable*, usually because they are
+standard macro names (for example, `BYTE_ORDER`) that on some platforms come
+from system headers (for example, `<sys/endian.h>` on FreeBSD). Such checks
+have `!` after their names on the first line of their implementation files
+(for example, `// BYTE_ORDER!`).
 
 An implementation of a check may depend on another check. As a result,
 substitutions should not be conditional at the preprocessor level (unless all
@@ -219,12 +221,53 @@ Below is the correct way to achieve the above semantics:
 
 ## Adding new checks
 
-To add a check for a new configuration option `<NAME>` simply create the
-`<NAME>.h` header file (preserving the case) with the corresponding check and
-place it into [`libbuild2/autoconf/checks/`][checks] (use existing checks for
-inspiration).
+There are two check catalogs: builtin, which is part of the `autoconf` module,
+and project-specific. Ideally, common checks which can be used by multiple
+projects should be added to the builtin rather than project catalog. In
+particular, this makes sure that fixes and improvement only need to be applied
+in one place rather than in all the projects that use the check.
 
-The first line in this header file must be in the form:
+Practically, however, there are several valid reasons why we may want to add a
+project-specific check:
+
+1. Test a common check on CI before proposing it for the builtin catalog.
+
+2. Release a project with a common check without waiting on the `autoconf`
+   release. Once the check is available as builtin, it can be dropped from
+   the project catalog.
+
+3. Override a broken builtin check with a fixed version. Similar to the
+   previous case, the check can be dropped once the fix is available in
+   the builtin version.
+
+4. Have a project-private check that is unlikely to be useful to any other
+   project.
+
+Note also that adding a project check because the same builtin check has a
+different name is not a valid reason: this case should be handled with
+`autoconf.aliases` discussed above.
+
+Checks from the project catalog take precedence over the builtin checks.
+However, to help detect cases where a project check can be dropped (items 1-3
+in the above list), the `autoconf` module issues a warning when a check with
+the same name exists in both catalogs. It's recommended that private checks
+(item 4) use names that can never clash with builtin checks since such checks
+could be used as bases by other builtin checks (see below for details on base
+checks). This can be achieved, for example, by embedding the project name in
+the check name (use `autoconf.alias` to retain the original name in output).
+
+To add a new configuration check `<NAME>` simply create the `<NAME>.h` header
+file (preserving the case) which will contain the check's implementation (use
+[existing checks][checks] for inspiration).
+
+Then, if this is a project-specific check, place it into the
+`build/autoconf/checks/` subdirectory of your project (or
+`build2/autoconf/checks/` if using the alternative naming scheme). And if this
+is a builtin check -- into [`libbuild2/autoconf/checks/`][checks] of
+`libbuild2-autoconf`.
+
+The format and semantics of this header file are exactly the same for both
+project and builtin catalogs. Its first line must be in the form:
 
 ```
 // <NAME>[!] [: <BASE>...]
@@ -232,20 +275,25 @@ The first line in this header file must be in the form:
 
 If the name is followed by the `!` modifier, then it is *unprefixable* (see
 the previous section for details). The name can also be followed by `:` and a
-list of base checks. Such checks are automatically inserted before the rest of
-the lines in the resulting substitution. One notable check that you may want
-to use as a base is [`BUILD2_AUTOCONF_LIBC_VERSION`][libc-version] (see
-comments for details).
+space-separated list of base checks. Such checks are automatically inserted
+before the rest of the lines in the resulting substitution. One notable check
+that you may want to use as a base is
+[`BUILD2_AUTOCONF_LIBC_VERSION`][libc-version] (see comments for details).
 
 Subsequent lines should be C-style comments or preprocessor directives that
 `#define` or `#undef` `<NAME>` depending on whether the feature is available
-(though there can be idiosyncrasies; see `const.h`, for example). Note that
-there should be no double-quotes or backslashes except for line
-continuations. For example, to add a check for option `HAVE_BAR`, we could
-create the `HAVE_BAR.h` header file with the following content:
+(though there can be idiosyncrasies; see [`const.h`][const], for example). The
+file may also contain C++-style comment lines, which (along with the first
+line) are excluded from the output. Note also that there should be no
+double-quotes or backslashes except for line continuations.
+
+For example, to add a new check `HAVE_BAR`, we could create the `HAVE_BAR.h`
+header file with the following content:
 
 ```
 // HAVE_BAR
+
+// TODO: maybe add support for Cygwin?
 
 #undef HAVE_BAR
 
@@ -307,3 +355,5 @@ other checks to verify that the base macros are in fact defined, for example:
 [proj-config]: https://build2.org/build2/doc/build2-build-system-manual.xhtml#proj-config
 [checks]: https://github.com/build2/libbuild2-autoconf/tree/master/libbuild2-autoconf/libbuild2/autoconf/checks/
 [libc-version]: https://github.com/build2/libbuild2-autoconf/tree/master/libbuild2-autoconf/libbuild2/autoconf/checks/BUILD2_AUTOCONF_LIBC_VERSION.h
+[const]: https://github.com/build2/libbuild2-autoconf/tree/master/libbuild2-autoconf/libbuild2/autoconf/checks/const.h
+[pkg-guide-modify-upstream]: https://build2.org/build2-toolchain/doc/build2-toolchain-packaging.xhtml#howto-patch-upstream-source-build

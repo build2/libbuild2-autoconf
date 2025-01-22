@@ -540,3 +540,37 @@ cat config.h >>EOO
   #undef PREFIX_zzz_TEST_DUMMY3_H
   #define PREFIX_zzz_TEST_DUMMY3_H zzz_TEST_DUMMY3_H
   EOO
+
+: project-checks
+:
+mkdir build;
+ln -s ../../bootstrap.build ../../root.build build/;
+mkdir -p build/autoconf/checks;
+cat <<EOI >=build/autoconf/checks/HAVE_FOO.h;
+  // HAVE_FOO: HAVE_BAR
+  #define HAVE_FOO HAVE_BAR
+  EOI
+cat <<EOI >=build/autoconf/checks/HAVE_BAR.h;
+  // HAVE_BAR!
+  #define HAVE_BAR 1
+  EOI
+cat <<EOI >=build/autoconf/checks/zzz_TEST_DUMMY1_H.h; # Override.
+  // zzz_TEST_DUMMY1_H
+  #undef zzz_TEST_DUMMY1_H
+  EOI
+cat <<EOI >=config.h.in;
+  #undef HAVE_FOO
+  #undef zzz_TEST_DUMMY1_H
+  EOI
+$* <<EOI 2>>~%EOE% &config.h &config.h.d;
+  ./: h{config}: in{config}
+  EOI
+  %.*zzz_TEST_DUMMY1_H.h: warning: check zzz_TEST_DUMMY1_H exists in builtin catalog, overriding%
+  %.{3}
+  EOE
+  cat config.h >>EOO
+  #define HAVE_BAR 1
+
+  #define HAVE_FOO HAVE_BAR
+  #undef zzz_TEST_DUMMY1_H
+  EOO

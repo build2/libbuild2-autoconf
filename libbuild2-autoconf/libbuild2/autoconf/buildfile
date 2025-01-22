@@ -9,9 +9,13 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
 
 # - File name must be the exact variable name plus .h (used for sorting).
 # - First line in the file should be `// <NAME> [<MODIFIER>] [:<BASE>...]`.
-# - No double-quote or backslash escaping except for line continuations.
+# - Lines starting with `//` (including the first) are removed (can be used
+#   to comment implementation details not to be copied to the output).
+# - No double-quotes or backslash escaping except for line continuations.
 #
 # NOTE: remember to update README.md if changing anything here.
+#
+# NOTE: see equivalent parsing code in load_project_checks().
 #
 <{hxx cxx}{checks}>: checks/file{*.h}
 {
@@ -48,7 +52,9 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
         const char* value;
       };
 
-      extern const check checks[$n];
+      using builtin_check = check;
+
+      extern const builtin_check builtin_checks[$n];
     }
   }
   EOI
@@ -56,7 +62,7 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
   cat <<"EOI" >$s
   #include <libbuild2/autoconf/checks.hxx>
 
-  const build2::autoconf::check build2::autoconf::checks[$n] = {
+  const build2::autoconf::builtin_check build2::autoconf::builtin_checks[$n] = {
   {
   \"\", \"\", \"\",
 
@@ -71,6 +77,8 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
     cat $i | set --newline ls [strings]
 
     # Extract the name (\1), modifier (\2) and base (\4) from the first line.
+    #
+    # Note: remember to update the C++ parsing code if changing anything here.
     #
     nmb = [strings] $regex.match($ls[0],                                     \
                                  '// ([^ !:]+) *(!)? *(: *(( *[^ ]+)+))? *', \
@@ -93,7 +101,8 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
     #
     # @@ Maybe we should get rid of the blank lines or at least collapse
     #    multiple blank lines (which are bound to occur because we are now
-    #    removing some lines) into a single one?
+    #    removing some lines) into a single one? Note: in the C++ version
+    #    we zap continuous comment/blank line blocks.
     #
     ls = $regex.filter_out_match($ls, '\s*//.*')
 

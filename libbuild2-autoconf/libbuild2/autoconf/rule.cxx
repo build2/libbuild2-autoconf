@@ -1,6 +1,7 @@
 #include <libbuild2/autoconf/rule.hxx>
 
-#include <cstring> // strcmp(), strchr()
+#include <cstring>   // strcmp(), strchr()
+#include <algorithm> // lower_bound()
 
 #include <libbuild2/depdb.hxx>
 #include <libbuild2/target.hxx>
@@ -8,8 +9,6 @@
 #include <libbuild2/diagnostics.hxx>
 
 #include <libbuild2/in/target.hxx>
-
-#include <libbuild2/autoconf/checks.hxx>
 
 using namespace std;
 
@@ -44,11 +43,12 @@ namespace build2
     };
 
     rule::
-    rule ()
+    rule (const project_checks& pcs)
         : in::rule ("autoconf.in 1",
                     "autoconf",
                     '@'   /* symbol */,
-                    false /* strict */)
+                    false /* strict */),
+          project_checks_ (pcs)
     {
     }
 
@@ -123,10 +123,10 @@ namespace build2
         l4 ([&]{trace << "prefix mismatch forcing update of" << t;});
 
       // Note that at first it may seem necessary to add something like the
-      // full module version in lieu of the built-in checks database hash.
+      // full module version in lieu of the builtin checks catalog hash.
       // Note, however, that any changes will be automatically taken care of
       // (and with better precision) as part of the substituted variable value
-      // checks by in::rule.
+      // checks by in::rule. Plus we now have project checks.
     }
 
     void rule::
@@ -545,8 +545,9 @@ namespace build2
 
         match_data& md (t.data<match_data> (a));
 
-        // If this is a special substitution, then look in our catalog of
-        // built-in checks. Specifically, the plan is as follows:
+        // If this is a special substitution, then look in our catalogs of
+        // checks (project then builtin). Specifically, the plan is as
+        // follows:
         //
         // 1. Suppress if a duplicate (we do it regardless of whether it is
         //    from the catalog or custom).
@@ -557,9 +558,10 @@ namespace build2
         //    variable is unlikely, something like const or volatile is
         //    possible. Since there is no way to undefine a buildfile variable
         //    (becasue we could always see a value from the outer scope), we
-        //    will treat null as an instruction to use the built-in check.
-        //    While this clashes with the in.null semantics, it's just as
-        //    easy to set the variable to the real default value as to null.
+        //    will treat null as an instruction to use a check from the
+        //    catalog. While this clashes with the in.null semantics, it's
+        //    just as easy to set the variable to the real default value as to
+        //    null.
         //
         //
         // 3. Look in the catalog and fall through if not found.
@@ -574,7 +576,7 @@ namespace build2
         md.checks.insert (n);
 
         // Note that if there is no prefix in the name, then we only look for
-        // an unprefixable built-in check.
+        // an unprefixable catalog check.
         //
         auto deprefix = [&md] (const string& n) -> const char*
         {
@@ -593,23 +595,6 @@ namespace build2
         const char* pn (deprefix (n));                    // Prefixless name.
         const char* en (pn != nullptr ? pn : n.c_str ()); // Effective name.
 
-        // If up is true, only look for an unprefixable check.
-        //
-        auto find = [] (const char* n, bool up = false) -> const check*
-        {
-          const check* e (checks + sizeof (checks) / sizeof (*checks));
-          const check* i (lower_bound (checks, e,
-                                       n,
-                                       [] (const check& c, const char* n)
-                                       {
-                                         return strcmp (c.name, n) < 0;
-                                       }));
-
-          return (i != e &&
-                  strcmp (i->name, n) == 0 &&
-                  (!up || strchr (i->modifier, '!') != nullptr)) ? i : nullptr;
-        };
-
         // Return true if there is a custom substitution for the name.
         //
         // Note: see above on the special NULL semantics.
@@ -620,7 +605,7 @@ namespace build2
           {
             auto i (smap->find (n));
 
-            // Note that we treat NULL as the "use built-in check" instruction
+            // Note that we treat NULL as the "use catalog check" instruction
             // (see above). So it's a return, not fall through.
             //
             if (i != smap->end ())
@@ -694,15 +679,14 @@ namespace build2
           auto base = [this,
                        &l, &t, a, smap, &null,
                        &md, &ns,
-                       &find, &custom,
-                       &append, &prefix] (const string& dn,
-                                          const char* bs,
-                                          const auto& base) -> void
+                       &custom, &append, &prefix] (const string& dn,
+                                                   const char* bs,
+                                                   const auto& base) -> void
           {
             auto df = make_diag_frame (
               [&dn] (const diag_record& dr)
               {
-                dr << info << "while resolving base options for " << dn;
+                dr << info << "while resolving base check for " << dn;
               });
 
             for (size_t b (0), e (0); next_word (bs, b, e); )
@@ -712,14 +696,14 @@ namespace build2
               // We have to look it up before suppressing duplicates to know
               // whether it should be prefixed.
               //
-              const check* c (find (pn.c_str ()));
+              optional<check> c (find_check (pn));
 
               // While it may be overridden by the user, we should also have
-              // the entry in the built-in catalog (where we get the
+              // an entry in the builtin or project catalog (where we get the
               // unprefixable flag).
               //
-              if (c == nullptr)
-                fail (l) << "unknown base option " << pn;
+              if (!c)
+                fail (l) << "unknown base check " << pn;
 
               // Derive the prefixed name.
               //
@@ -762,14 +746,14 @@ namespace build2
             }
           };
 
-          // Return true if the built-in check is prefix-compatible with the
+          // Return true if the check is prefix-compatible with the
           // substitution.
           //
-          auto prefix_compatible = [&md] (const check* c, const char* pn)
+          auto prefix_compatible = [&md] (const check& c, const char* pn)
           {
-            return (md.prefix.empty ()                   || // No prefix.
-                    strchr (c->modifier, '!') == nullptr || // Prefixable.
-                    pn == nullptr);                         // Unprefixed.
+            return (md.prefix.empty ()                  || // No prefix.
+                    strchr (c.modifier, '!') == nullptr || // Prefixable.
+                    pn == nullptr);                        // Unprefixed.
           };
 
           // See if this is an alias.
@@ -780,7 +764,7 @@ namespace build2
             if (i != md.aliases->end ())
             {
               // Reduce this to the base with a synthesized "derived" check
-              // (pretty much how we would implement it if it were a built-in
+              // (pretty much how we would implement it if it were a catalog
               // check).
               //
               const string& an (i->second);
@@ -788,9 +772,9 @@ namespace build2
               pn = deprefix (an);
               en = pn != nullptr ? pn : an.c_str ();
 
-              const check* c (find (en, pn == nullptr));
-              if (c == nullptr || !prefix_compatible (c, pn))
-                fail (l) << "unknown aliased option " << en <<
+              optional<check> c (find_check (en, pn == nullptr));
+              if (!c || !prefix_compatible (*c, pn))
+                fail (l) << "unknown aliased check " << en <<
                   info << "while resolving alias " << n;
 
               base (n, en, base);
@@ -818,8 +802,8 @@ namespace build2
             }
           }
 
-          const check* c (find (en, pn == nullptr));
-          if (c != nullptr && prefix_compatible (c, pn))
+          optional<check> c (find_check (en, pn == nullptr));
+          if (c && prefix_compatible (*c, pn))
           {
             // The plan is as follows: keep adding base checks (suppressing
             // duplicates) followed by the main check while prefixing all the
@@ -846,6 +830,54 @@ namespace build2
       }
 
       return in::rule::lookup (l, a, t, n, nullopt, smap, null);
+    }
+
+    optional<check> rule::
+    find_check (const char* n, bool up) const
+    {
+      if (!project_checks_.empty ())
+      {
+        auto e (project_checks_.end ());
+        auto i (lower_bound (project_checks_.begin (), e,
+                             n,
+                             [] (const project_check& c, const char* n)
+                             {
+                               return c.name < n;
+                             }));
+
+        if (i != e       &&
+            i->name == n &&
+            (!up || i->modifier.find ('!') != string::npos))
+        {
+          return check {i->name.c_str (),
+                        i->modifier.c_str (),
+                        i->base.c_str (),
+                        i->value.c_str ()};
+        }
+      }
+
+      if (const builtin_check* bc = find_builtin_check (n, up))
+        return *bc;
+
+      return nullopt;
+    }
+
+    const builtin_check* rule::
+    find_builtin_check (const char* n, bool up)
+    {
+      const builtin_check* e (
+        builtin_checks + sizeof (builtin_checks) / sizeof (*builtin_checks));
+      const builtin_check* i (
+        lower_bound (builtin_checks, e,
+                     n,
+                     [] (const builtin_check& c, const char* n)
+                     {
+                       return strcmp (c.name, n) < 0;
+                     }));
+
+      return (i != e &&
+              strcmp (i->name, n) == 0 &&
+              (!up || strchr (i->modifier, '!') != nullptr)) ? i : nullptr;
     }
   }
 }
