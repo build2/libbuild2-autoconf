@@ -10,6 +10,6 @@
  *       https://docs.microsoft.com/en-us/cpp/intrinsics/x86-intrinsics-list
  *       https://docs.microsoft.com/en-us/cpp/intrinsics/x64-amd64-intrinsics-list)
  */
-#ifdef __XOP__
+#if defined(__XOP__) || (defined(_MSC_VER) && defined(_M_AMD64))
 #  define HAVE_XOP 1
 #endif
