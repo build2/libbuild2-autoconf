@@ -13,13 +13,6 @@
       */
 #    if defined(__has_include) && __has_include(<udplite.h>)
 #      define HAVE_UDPLITE_H 1
-#    else
-       /* udplite.h is missing despite kernel support; define constants manually.
-        * see: https://man7.org/linux/man-pages/man7/udplite.7.html
-       */
-#      define IPPROTO_UDPLITE    136
-#      define UDPLITE_SEND_CSCOV 10
-#      define UDPLITE_RECV_CSCOV 11
 #    endif
 #  endif
 #endif
