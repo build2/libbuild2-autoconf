@@ -15,6 +15,7 @@
     BUILD2_AUTOCONF_MACOS_PREREQ(10, 3)    || \
     BUILD2_AUTOCONF_GLIBC_PREREQ(2, 2)     || \
     BUILD2_AUTOCONF_MINGW_PREREQ(2, 0)     || \
-    defined(_MSC_VER)
+    defined(_WIN32) || \
+    defined(__CYGWIN__)
 #  define HAVE_INTTYPES_H 1
 #endif
