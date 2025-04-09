@@ -71,7 +71,7 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
   EOI
 
   for i: $is
-
+  {
     # Split the contents of the file into lines.
     #
     cat $i | set --newline ls [strings]
@@ -86,7 +86,6 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
 
     if ($nmb == [null])
       exit "incorrect first line format in $i"
-    end
 
     # Note that if there is no modifier or base, we get empty strings.
     #
@@ -115,7 +114,7 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
       <<<"$regex.merge($ls, '(.*)', '\1', $\n, format_copy_empty)" >>$s
 
     echo '},' >>$s
-  end
+  }
 
   cat <<EOI >>$s
 
