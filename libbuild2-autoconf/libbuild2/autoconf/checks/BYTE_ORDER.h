@@ -12,7 +12,10 @@
 #elif defined(__FreeBSD__) || defined(__NetBSD__)
 #  include <sys/endian.h>
 #elif defined(__APPLE__)
-#  include <machine/endian.h>
+// NOTE: This header is deprecated and also causes various
+//       issues with defines like u_int and friends, and
+//       strictly speaking it shouldn't be necessary.
+//#  include <machine/endian.h>
 #elif !defined(_WIN32)
 #  include <sys/param.h>
 #endif
@@ -43,11 +46,15 @@
 #    define BIG_ENDIAN    4321
 #    define LITTLE_ENDIAN 1234
 #    define BYTE_ORDER    LITTLE_ENDIAN
-#  elif defined(__BYTE_ORDER__) &&       \
-        defined(__ORDER_BIG_ENDIAN__) && \
-        defined(__ORDER_LITTLE_ENDIAN__)
-     /* GCC, Clang (and others, potentially).
-      */
+#  endif
+#endif
+
+/* Fallback: GCC, Clang (specifically apple-silicon and others, potentially).
+ */
+#ifndef BYTE_ORDER
+#  if defined(__BYTE_ORDER__)       && \
+      defined(__ORDER_BIG_ENDIAN__) && \
+      defined(__ORDER_LITTLE_ENDIAN__)
 #    define BYTE_ORDER    __BYTE_ORDER__
 #    define BIG_ENDIAN    __ORDER_BIG_ENDIAN__
 #    define LITTLE_ENDIAN __ORDER_LITTLE_ENDIAN__
