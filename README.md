@@ -219,6 +219,87 @@ Below is the correct way to achieve the above semantics:
 #endif
 ```
 
+
+## Communicating check results to `buildfiles`
+
+The results of the checks are represented as preprocessor macros and are
+normally used in source files. However, sometimes we may need these results to
+be available in `buildfiles`. For example, we may need them to decide whether
+to use a certain compiler option or to exclude certain source files from the
+build.
+
+The results of the checks can be communicated to `buildfiles` by combining two
+`build2` mechanisms: the [`c.predefs` rule][build2-predefs], which allows us
+to extract macro values from header files, and [the `update`
+directive][build2-udl], which allow us to update a target while load a
+`buildfile`. Specifically, we can extra macro values from the
+`autoconf`-generated header into a `buildfile` fragment (or a JSON file) and
+then include this fragment (or load this JSON file) into our `buildfile`.
+
+As an example, let's make the value of the `BYTE_ORDER` macro available in
+our `buildfile` in order to decide which source file to include into the
+build. First we prepare `byte-order.h.in`:
+
+```
+/* byte-order.h.in */
+
+#undef BYTE_ORDER
+
+#if BYTE_ORDER == LITTLE_ENDIAN
+#  define BYTE_ORDER_LITTLE_ENDIAN true
+#elif BYTE_ORDER == BIG_ENDIAN
+#  define BYTE_ORDER_LITTLE_ENDIAN false
+#else
+#  error unexpected byte order
+#endif
+```
+
+Then we load the `c.predefs` submodule after `c` in our `root.build`:
+
+```
+# root.build
+#
+using c
+using c.predefs
+```
+
+Finally, at the beginning of our `buildfile` we add the following fragment:
+
+```
+# Detect target endianness.
+#
+using autoconf
+
+h{byte-order}: in{byte-order}
+
+[rule_hint=c.predefs] buildfile{byte-order}: h{byte-order}
+{
+  c.predefs.poptions = false
+  c.predefs.macros = BYTE_ORDER_LITTLE_ENDIAN@little_endian
+}
+
+./: buildfile{byte-order} # Make sure it gets cleaned.
+
+if ($build.meta_operation == 'perform')
+{
+  update buildfile{byte-order}
+  source $path(buildfile{byte-order})
+}
+else
+  little_endian = false
+```
+
+After this fragment we can use the `little_endian` variable to make decisions
+in our `buildfile`:
+
+```
+/: exe{hello}: cxx{hello}
+
+exe{hello}: cxx{hello-big}:    include = (!$little_endian)
+exe{hello}: cxx{hello-little}: include = $little_endian
+```
+
+
 ## Adding new checks
 
 There are two check catalogs: builtin, which is part of the `autoconf` module,
@@ -357,3 +438,5 @@ other checks to verify that the base macros are in fact defined, for example:
 [libc-version]: https://github.com/build2/libbuild2-autoconf/tree/master/libbuild2-autoconf/libbuild2/autoconf/checks/BUILD2_AUTOCONF_LIBC_VERSION.h
 [const]: https://github.com/build2/libbuild2-autoconf/tree/master/libbuild2-autoconf/libbuild2/autoconf/checks/const.h
 [pkg-guide-modify-upstream]: https://build2.org/build2-toolchain/doc/build2-toolchain-packaging.xhtml#howto-patch-upstream-source-build
+[build2-predefs]:https://build2.org/stage/build2/doc/build2-build-system-manual.xhtml#c-predefs
+[build2-udl]:https://build2.org/stage/build2/doc/build2-build-system-manual.xhtml#directives-update
