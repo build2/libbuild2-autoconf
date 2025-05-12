@@ -1,0 +1,18 @@
+// HAVE_MKSTEMP : BUILD2_AUTOCONF_LIBC_VERSION
+
+#ifndef BUILD2_AUTOCONF_LIBC_VERSION
+#  error BUILD2_AUTOCONF_LIBC_VERSION appears to be conditionally included
+#endif
+
+#undef HAVE_MKSTEMP
+
+/*  Since glibc 2.1, 4.3BSD, FreeBSD 1.0, OpenBSD 2.2, NetBSD 1.3, MacOS v?, Mingw-w64 2.0
+ */
+#if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 1) || \
+    BUILD2_AUTOCONF_FREEBSD_PREREQ(1, 0) || \
+    BUILD2_AUTOCONF_OPENBSD_PREREQ(199712) || \
+    BUILD2_AUTOCONF_NETBSD_PREREQ(1, 3) || \
+    BUILD2_AUTOCONF_MINGW_PREREQ(1, 0) || \
+    defined(__APPLE__)
+#  define HAVE_MKSTEMP 1
+#endif
