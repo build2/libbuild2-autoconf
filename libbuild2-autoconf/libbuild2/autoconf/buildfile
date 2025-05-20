@@ -84,7 +84,7 @@ lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
                                  '// ([^ !:]+) *(!)? *(: *(( *[^ ]+)+))? *', \
                                  return_subs)
 
-    if ($nmb == [null])
+    ifn $nmb
       exit "incorrect first line format in $i"
 
     # Note that if there is no modifier or base, we get empty strings.
