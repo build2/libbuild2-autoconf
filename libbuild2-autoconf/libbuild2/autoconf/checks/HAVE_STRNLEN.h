@@ -6,10 +6,10 @@
 
 #undef HAVE_STRNLEN
 
-/* This checks for strnlen(), which calculates the length of a string up to a
- * specified maximum. It is a POSIX function.
+/* Check for the strnlen() function which calculates the length of a string up
+ * to a specified maximum.
  *
- * Since OpenBSD 4.8 (November 2010).
+ * POSIX, OpenBSD 4.8 (November 2010).
  */
 #if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 0)     || \
     BUILD2_AUTOCONF_FREEBSD_PREREQ(8, 0)   || \

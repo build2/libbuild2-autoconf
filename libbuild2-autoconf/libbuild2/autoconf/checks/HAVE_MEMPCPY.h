@@ -6,8 +6,10 @@
 
 #undef HAVE_MEMPCPY
 
-/* This checks for mempcpy() availability, which copies memory and
- * returns a pointer to the end of the copied data. It's a GNU extension.
+/* Check for the mempcpy() function which copies memory and returns a pointer
+ * to the end of the copied data.
+ *
+ * This is a GNU extension. Not available on Windows (except Mingw-w64).
  */
 #if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 1) || \
     BUILD2_AUTOCONF_MINGW_PREREQ(2, 0) || \

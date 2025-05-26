@@ -2,10 +2,10 @@
 
 #undef HAVE_STRNCASECMP
 
-/* This checks for the availability of the strncasecmp() function,
- * which performs a case-insensitive comparison of two strings up
- * to a specified number of characters.
- * It is part of the POSIX standard and is widely available on Unix-like systems.
+/* Check for the strncasecmp() function which performs a case-insensitive
+ * comparison of two strings up to a specified number of characters.
+ *
+ * It is a POSIX function. Not available on Windows (except Mingw-w64).
  *
  * strncasecmp() and strcasecmp() were added at the same time in all of the
  * systems I checked (see HAVE_STRCASECMP.h).

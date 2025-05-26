@@ -6,8 +6,10 @@
 
 #undef HAVE_STRCASECMP
 
-/* This checks for strcasecmp(), which compares two strings
- * case-insensitively. It is a POSIX-compliant function.
+/* Check for the strcasecmp() function which compares two strings
+ * case-insensitively.
+ *
+ * It is a POSIX function. Not available on Windows (except Mingw-w64).
  */
 #if BUILD2_AUTOCONF_GLIBC_PREREQ(1, 9)  || \
     defined(__FreeBSD__)                || \

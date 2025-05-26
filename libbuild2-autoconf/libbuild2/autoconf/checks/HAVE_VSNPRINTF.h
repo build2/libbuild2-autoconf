@@ -2,7 +2,7 @@
 
 #undef HAVE_VSNPRINTF
 
-/* Checks for the vsnprintf() function, which formats a string into a buffer
+/* Check for the vsnprintf() function which formats a string into a buffer
  * with variable arguments.
  *
  * vsnprintf() and snprintf() were added at the same time in all of the

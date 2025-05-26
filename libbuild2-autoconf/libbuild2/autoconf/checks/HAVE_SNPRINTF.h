@@ -6,8 +6,10 @@
 
 #undef HAVE_SNPRINTF
 
-/* This checks for the snprintf() function, which safely formats strings into
- * a buffer. It’s part of the C99 standard and widely available.
+/* Check for the snprintf() function which safely formats strings into a
+ * buffer.
+ *
+ * It is part of the C99 standard and widely available.
  */
 #if defined(__GLIBC__)                  || \
     defined(__FreeBSD__)                || \
