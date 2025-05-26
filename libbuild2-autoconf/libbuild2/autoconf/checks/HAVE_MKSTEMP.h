@@ -6,8 +6,10 @@
 
 #undef HAVE_MKSTEMP
 
-/*  glibc; 4.3BSD and thus FreeBSD, OpenBSD, NetBSD, and Mac OS X since the
- *  beginning; Mingw-w64 4.0.
+/* Check for the mkstemp() function.
+ *
+ * glibc; 4.3BSD and thus FreeBSD, OpenBSD, NetBSD, and Mac OS X since the
+ * beginning; Mingw-w64 4.0. Not available on Windows (except Mingw-w64).
  */
 #if defined(__GLIBC__)                 || \
     defined(__FreeBSD__)               || \

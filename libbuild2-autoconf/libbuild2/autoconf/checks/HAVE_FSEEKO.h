@@ -6,10 +6,10 @@
 
 #undef HAVE_FSEEKO
 
-/* This checks for fseeko(), which is a large-file-aware alternative to
+/* Check for the fseeko() function which is a large-file-aware alternative to
  * fseek().
  *
- * Since OpenBSD 2.7 (June 2000).
+ * Since OpenBSD 2.7 (June 2000). Not available on Windows (except Mingw-w64).
  */
 #if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 1)     || \
     BUILD2_AUTOCONF_FREEBSD_PREREQ(3, 2)   || \

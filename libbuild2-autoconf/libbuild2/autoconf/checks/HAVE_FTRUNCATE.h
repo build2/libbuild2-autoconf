@@ -6,8 +6,10 @@
 
 #undef HAVE_FTRUNCATE
 
-/* This checks if ftruncate() is available, which truncates a file to a
- * specified length.
+/* Check for the ftruncate() function which truncates a file to a specified
+ * length.
+ *
+ * Note: not available on Windows (except Mingw-w64).
  */
 #if defined(__GLIBC__)             || \
     defined(__FreeBSD__)           || \

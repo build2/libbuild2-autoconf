@@ -6,14 +6,16 @@
 
 #undef HAVE_ACCESS
 
-/*  Since glibc 2.1, BSD 4.3, FreeBSD 1.0, OpenBSD 2.0 (October 1996), NetBSD
- *  1.0, MacOS, Windows (including MinGW, Mingw-w64), POSIX.1, SVr4.
+/* Check for the access() function.
  *
- *  Note that on Windows access() is deprecated in favor of _access() because
- *  it is a POSIX function that 'doesn't follow the Standard C rules for
- *  implementation-specific names'. It is still supported but a warning will
- *  be issued unless the _CRT_NONSTDC_NO_WARNINGS preprocessor macro is
- *  defined.
+ * Since glibc 2.1, BSD 4.3, FreeBSD 1.0, OpenBSD 2.0 (October 1996), NetBSD
+ * 1.0, MacOS, Windows (including MinGW, Mingw-w64), POSIX.1, SVr4.
+ *
+ * Note that on Windows access() is deprecated in favor of _access() because
+ * it is a POSIX function that 'doesn't follow the Standard C rules for
+ * implementation-specific names'. It is still supported but a warning will
+ * be issued unless the _CRT_NONSTDC_NO_WARNINGS preprocessor macro is
+ * defined.
  */
 #if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 1)     || \
     BUILD2_AUTOCONF_FREEBSD_PREREQ(1, 0)   || \

@@ -2,7 +2,7 @@
 
 #undef HAVE_FILENO
 
-/* Checks for the fileno() function, which retrieves the file descriptor
+/* Check for the fileno() function which retrieves the file descriptor
  * associated with a FILE* stream.
  */
 #if defined(__GLIBC__)   || \
