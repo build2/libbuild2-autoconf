@@ -2,7 +2,9 @@
 
 #undef HAVE_GETOPT
 
-/* Since POSIX.2 and 4.3BSD.
+/* Check for the getopt() function.
+ *
+ * Since POSIX.2 and 4.3BSD. Not available on Windows (except Mingw-w64).
  */
 #if defined(__GLIBC__)             || \
     defined(__FreeBSD__)           || \

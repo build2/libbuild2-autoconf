@@ -2,7 +2,9 @@
 
 #undef HAVE_GETRUSAGE
 
-/* Since POSIX.1-2001, SVr4, and 4.3BSD.
+/* Check for the getrusage() function.
+ *
+ * Since POSIX.1-2001, SVr4, and 4.3BSD.
  */
 #if defined(__GLIBC__)             || \
     defined(__FreeBSD__)           || \

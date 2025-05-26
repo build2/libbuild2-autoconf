@@ -6,8 +6,11 @@
 
 #undef HAVE_LOCALTIME_R
 
-/*  Since glibc 2.0, 4.3BSD, FreeBSD 8.0, OpenBSD 2.5 (May 1999), NetBSD 1.4,
- *  MacOS 10.0, Mingw-w64 2.0, POSIX.1c, SVr4
+/*  Check for the localtime_r() function.
+ *
+ *  Since glibc 2.0, 4.3BSD, FreeBSD 8.0, OpenBSD 2.5 (May 1999), NetBSD 1.4,
+ *  MacOS 10.0, Mingw-w64 2.0, POSIX.1c, SVr4. Not available on Windows
+ *  (except Mingw-w64).
  */
 #if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 0)     || \
     BUILD2_AUTOCONF_FREEBSD_PREREQ(8, 0)   || \

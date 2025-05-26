@@ -6,8 +6,8 @@
 
 #undef HAVE_SCHED_GETAFFINITY
 
-/* Presence of the sched_getaffinity() function, which retrieves
- * the CPU affinity of a process (i.e., which CPUs a process can run on).
+/* Check for the sched_getaffinity() function which retrieves the CPU affinity
+ * of a process (i.e., which CPUs a process can run on).
  *
  * Since glibc 2.3.
  */

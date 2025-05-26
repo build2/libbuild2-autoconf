@@ -2,8 +2,11 @@
 
 #undef HAVE_GMTIME_R
 
-/* Since POSIX.2, glibc 2.0, FreeBSD 8.0, OpenBSD 2.7 (June 2000), NetBSD 1.3,
- * macOS, Mingw-w64 (since before v1.0), Solaris.
+/* Check for the gmtime_r() function.
+ *
+ * Since POSIX.2, glibc 2.0, FreeBSD 8.0, OpenBSD 2.7 (June 2000), NetBSD 1.3,
+ * macOS, Mingw-w64 (since before v1.0), Solaris. Not available on Windows
+ * (except Mingw-w64).
  */
 #if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 0)     || \
     BUILD2_AUTOCONF_FREEBSD_PREREQ(8, 0)   || \

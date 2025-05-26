@@ -6,7 +6,7 @@
 
 #undef HAVE_REALPATH
 
-/* This checks for the realpath() function, which resolves absolute paths.
+/* Check for the realpath() function which resolves absolute paths.
  *
  * Since glibc 1.90, FreeBSD 2.2.0, NetBSD 1.1, OpenBSD (with initial NetBSD
  * import), macOS 10.2.

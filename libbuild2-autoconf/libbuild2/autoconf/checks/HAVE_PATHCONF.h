@@ -6,8 +6,8 @@
 
 #undef HAVE_PATHCONF
 
-/* Checks for pathconf(), which retrieves system configuration values for a
- * specific path.
+/* Check for the pathconf() function which retrieves system configuration
+ * values for a specific path.
  */
 #if defined(__GLIBC__)   || \
     defined(__FreeBSD__) || \
