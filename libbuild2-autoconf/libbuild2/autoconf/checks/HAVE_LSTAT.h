@@ -6,11 +6,10 @@
 
 #undef HAVE_LSTAT
 
-/*
- * lstat() is available in:
- * - glibc since 1.90
- * - 4.2 BSD and thus all BSD systems (including MacOS) since the beginning
- * - Solaris
+/* Check for the lstat() function.
+ *
+ * glibc 1.90, 4.2BSD and thus all BSD systems (including MacOS) since the
+ * beginning, Solaris.
  */
 #if BUILD2_AUTOCONF_GLIBC_PREREQ(1, 90) || \
     defined(__FreeBSD__)                || \

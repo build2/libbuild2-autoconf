@@ -6,9 +6,10 @@
 
 #undef HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC
 
-/* Presence of the st_mtim.tv_nsec field in the stat structure, which provides
- * nanosecond resolution for file modification times.  Since glibc 2.12,
- * FreeBSD 9.0, OpenBSD 2.0 (October 1996), NetBSD 7.0.
+/* Check for the presence of the st_mtim.tv_nsec field in the stat structure,
+ * which provides nanosecond resolution for file modification times.
+ *
+ * Since glibc 2.12, FreeBSD 9.0, OpenBSD 2.0 (October 1996), NetBSD 7.0.
  */
 #if BUILD2_AUTOCONF_GLIBC_PREREQ(2, 12)    || \
     BUILD2_AUTOCONF_FREEBSD_PREREQ(9, 0)   || \

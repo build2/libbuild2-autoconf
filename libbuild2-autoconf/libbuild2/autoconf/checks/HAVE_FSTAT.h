@@ -6,7 +6,7 @@
 
 #undef HAVE_FSTAT
 
-/* Checks for the fstat() function, which retrieves file information using a
+/* Check for the fstat() function which retrieves file information using a
  * file descriptor.
  *
  * The Windows equivalent is _fstat*() (see the HAVE__FSTAT* checks).

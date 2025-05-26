@@ -6,8 +6,10 @@
 
 #undef HAVE_STAT
 
-/* This checks for the stat system call, used to retrieve file status information.
- * Commonly available in POSIX systems.
+/* Check for the stat() function which retrieves file status information.
+ *
+ * Commonly available in POSIX systems. Not available on Windows (except
+ * Mingw-w64).
  */
 #if defined(__GLIBC__)                   || \
     defined(__FreeBSD__)                 || \
