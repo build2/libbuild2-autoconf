@@ -6,8 +6,8 @@
 
 #undef HAVE_HTOLE16
 
-/* Checks for a macro or function to convert a 16-bit
- * integer from host to little-endian format.
+/* Check for the htole16() macro/function which converts a 16-bit integer from
+ * host to little-endian format.
  *
  * Since OpenBSD 2.1 (June 1997).
  *

@@ -2,8 +2,8 @@
 
 #undef HAVE_ENDIAN_H
 
-/* This checks if the endian.h header is available, which provides macros for
- * byte-order manipulation.
+/* Check for the endian.h header which provides macros for byte-order
+ * manipulation.
  */
 #if defined(__GLIBC__) || \
     defined(__OpenBSD__)

@@ -2,8 +2,8 @@
 
 #undef HAVE_SYS_ENDIAN_H
 
-/* This checks if the sys/endian.h header is available, which provides macros
- * for byte-order manipulation.
+/* Check for the sys/endian.h header which provides macros for byte-order
+ * manipulation.
  */
 #if defined(__FreeBSD__) || \
     defined(__NetBSD__)

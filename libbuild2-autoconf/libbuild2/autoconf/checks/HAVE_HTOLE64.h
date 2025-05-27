@@ -2,8 +2,8 @@
 
 #undef HAVE_HTOLE64
 
-/* Checks for a macro or function to convert a 64-bit
- * integer from host to little-endian format.
+/* Check for the htole64() macro/function which converts a 64-bit integer from
+ * host to little-endian format.
  *
  * Added at the same time as htole16() on all platforms checked.
  */
