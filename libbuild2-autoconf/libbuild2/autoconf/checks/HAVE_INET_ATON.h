@@ -6,7 +6,9 @@
 
 #undef HAVE_INET_ATON
 
-/* Since 4.2BSD (1983).
+/* Check for the inet_aton() function.
+ *
+ * Since 4.2BSD (1983).
  */
 #if defined(__GLIBC__)   || \
     defined(__FreeBSD__) || \

@@ -6,11 +6,10 @@
 
 #undef HAVE_SOCKLEN_T
 
-/* socklen_t is available in:
- * - glibc since 2.0.x (so round up to 2.1)
- * - BSD systems (including MacOS)
- * - OpenBSD since 2.5 (May 1999)
- * - Windows, Mingw-w64, Cygwin, Solaris
+/* Check for the socklen_t type.
+ *
+ * glibc 2.0.x (so round up to 2.1), BSD systems (including MacOS), OpenBSD
+ * 2.5 (May 1999), Windows, Mingw-w64, Cygwin, Solaris.
  *
  * On Windows the winsock2 header ws2tcpip.h defines socklen_t. Mingw-w64 has
  * had socklen_t (also in ws2tcpip.h) since v1.0.

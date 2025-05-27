@@ -2,7 +2,9 @@
 
 #undef HAVE_CLOSESOCKET
 
-/* Windows, Mingw.
+/* Check for the closesocket() function.
+ *
+ * Windows and MinGW.
  */
 #if defined(_WIN32) || \
     defined(__MINGW32__)
