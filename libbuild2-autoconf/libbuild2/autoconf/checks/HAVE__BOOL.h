@@ -2,7 +2,7 @@
 
 #undef HAVE__BOOL
 
-/* Checks if the _Bool type is supported, which is standard in C99.
+/* Check for the C99 _Bool type.
  *
  * @@ TMP Although this check does look correct, HAVE_STDBOOL_H is defined to
  *    1 unconditionally but <stdbool.h> defines bool to _Bool and thus
