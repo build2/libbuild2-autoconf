@@ -6,7 +6,7 @@
 
 #undef HAVE_MEMALIGN
 
-/* Presence of memalign() function.
+/* Check for the memalign() function.
  *
  * glibc 2.0, Solaris.
  */

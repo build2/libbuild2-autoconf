@@ -6,7 +6,7 @@
 
 #undef HAVE_POSIX_MEMALIGN
 
-/* Presence of posix_memalign() function.
+/* Check for the posix_memalign() function.
  *
  * Since glibc 2.1.91, FreeBSD 7.0, OpenBSD 4.8 (November 2010), NetBSD 5.0,
  * MacOS 10.6.
