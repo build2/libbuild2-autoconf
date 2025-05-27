@@ -6,8 +6,10 @@
 
 #undef HAVE_PTHREAD_CANCEL
 
-/* Presence of the pthread_cancel() function.  Since glibc 2.1, FreeBSD 4.0,
- * OpenBSD 2.5 (May 1999), NetBSD 2.0, and MacOS 10.10.
+/* Check for the pthread_cancel() function.
+ *
+ * Since glibc 2.1, FreeBSD 4.0, OpenBSD 2.5 (May 1999), NetBSD 2.0, and MacOS
+ * 10.10.
  *
  * Note: see also HAVE_PTHREAD (especially with regards to Mingw-w64).
  */

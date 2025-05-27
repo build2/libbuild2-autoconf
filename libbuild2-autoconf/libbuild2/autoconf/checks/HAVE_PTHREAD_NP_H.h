@@ -6,7 +6,7 @@
 
 #undef HAVE_PTHREAD_NP_H
 
-/* Existence of the pthread_np.h header, which provides non-portable pthread
+/* Check for the pthread_np.h header which provides non-portable pthread
  * functions.
  *
  * Since FreeBSD 5.1 and OpenBSD 2.4 (December 1998).
