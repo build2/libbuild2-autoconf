@@ -17,7 +17,7 @@ namespace build2
   namespace autoconf
   {
     static project_checks
-    load_project_checks (tracer&, const scope&, const location&);
+    load_project_checks (tracer&, const scope&, bool, const location&);
 
     //-
     // The `autoconf` module.
@@ -35,6 +35,8 @@ namespace build2
 
       if (first)
       {
+        context& ctx (rs.ctx);
+
         // Load in.base (in.* variables, in{} target type).
         //
         load_module (rs, rs, "in.base", l);
@@ -72,7 +74,12 @@ namespace build2
 
         // Load project-specific checks from build/autoconf/.
         //
-        project_checks pcs (load_project_checks (trace, rs, l));
+        // If we are preparing a source distribution, then enter them as
+        // targets so that they are automatically included.
+        //
+        project_checks pcs (
+          load_project_checks (
+            trace, rs, ctx.current_mif->id == dist_id, l));
 
         module& m (extra.set_module (new module (move (pcs))));
 
@@ -96,7 +103,10 @@ namespace build2
     static const dir_path checks_dir (dir_path ("autoconf") /= "checks");
 
     static project_checks
-    load_project_checks (tracer& trace, const scope& rs, const location& loc)
+    load_project_checks (tracer& trace,
+                         const scope& rs,
+                         bool enter,
+                         const location& loc)
     {
       dir_path d (rs.src_path () / rs.root_extra->build_dir / checks_dir);
 
@@ -108,6 +118,8 @@ namespace build2
         {
           dr << info (loc) << "while loading project checks from " << d;
         });
+
+      context& ctx (rs.ctx);
 
       try
       {
@@ -346,6 +358,27 @@ namespace build2
                    << "base: '" << pc.base << "'\n"
                    << '\'' << pc.value << '\'';
 #endif
+
+              // Enter as a target if requested.
+              //
+              if (enter)
+              {
+                // The file name is absolute and normalized by construction.
+                //
+                dir_path d (f.directory ());
+                dir_path o (rs.out_eq_src () ? dir_path () : out_src (d, rs));
+
+                // Would have been nicer to make them h{} but we currently
+                // don't have a dependency on the cc module and it's probably
+                // not worth introducing just for that.
+                //
+                ctx.targets.insert_implied<file> (
+                  move (d),
+                  move (o),
+                  pc.name,
+                  "h",
+                  trace);
+              }
 
               pcs.push_back (move (pc));
 
