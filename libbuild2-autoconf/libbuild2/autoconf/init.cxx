@@ -376,7 +376,7 @@ namespace build2
                   move (d),
                   move (o),
                   pc.name,
-                  "h",
+                  string ("h"),
                   trace);
               }
 
