@@ -9,10 +9,11 @@
 /* Since Version 7 AT&T UNIX, 4.3BSD-Tahoe (OpenBSD, FreeBSD, NetBSD, Mac OS X),
  * glibc 1.09
  */
-#if defined(__FreeBSD__)            || \
-    defined(__OpenBSD__)            || \
-    defined(__NetBSD__)             || \
-    defined(BUILD2_AUTOCONF_MACOS)  || \
-    BUILD2_AUTOCONF_GLIBC_PREREQ(1, 9)
+#if defined(__FreeBSD__)               || \
+    defined(__OpenBSD__)               || \
+    defined(__NetBSD__)                || \
+    defined(BUILD2_AUTOCONF_MACOS)     || \
+    BUILD2_AUTOCONF_GLIBC_PREREQ(1, 9) || \
+    defined(_WIN32)
 #  define HAVE_GETENV 1
 #endif

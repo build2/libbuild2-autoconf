@@ -6,6 +6,6 @@
 
 #undef HAVE_SYS_TYPES_H
 /* Linux only (?) */
-#if defined(__linux__)
+#if defined(__linux__) || defined(__MINGW32__) || defined(__CYGWIN__)
 #  define HAVE_SYS_TYPES_H 1
 #endif
