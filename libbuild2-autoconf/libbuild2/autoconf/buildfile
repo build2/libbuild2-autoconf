@@ -1,7 +1,9 @@
 intf_libs = # Interface dependencies.
 impl_libs = # Implementation dependencies.
 
-import impl_libs += build2%lib{build2} # Implied interface dependency.
+import libbuild2 = build2%lib{build2}
+
+import impl_libs += $libbuild2 # Implied interface dependency.
 import impl_libs += build2%lib{build2-in}
 
 lib{build2-autoconf}: {hxx ixx txx cxx}{* -checks} {hxx cxx}{checks} \
@@ -184,7 +186,17 @@ else
 
 # Embed the build system core version as our load suffix.
 #
-libs{build2-autoconf}: bin.lib.load_suffix = "-$build.version.interface"
+# Get the version as exported by the lib{build2} target falling back to the
+# running build system version if unable to (installed lib{build2}).
+#
+iv = ($project($libbuild2) == [null]     \
+      ? $($libbuild2: interface_version) \
+      : [null])
+
+ifn $iv
+  iv = $build.version.interface
+
+libs{build2-autoconf}: bin.lib.load_suffix = "-$iv"
 
 # Install into the libbuild2/autoconf/ subdirectory of, say, /usr/include/
 # recreating subdirectories.
