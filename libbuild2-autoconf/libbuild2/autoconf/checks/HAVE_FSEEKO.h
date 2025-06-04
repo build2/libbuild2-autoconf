@@ -18,6 +18,6 @@
     BUILD2_AUTOCONF_MACOS_PREREQ(10, 0)    || \
     defined(__CYGWIN__)                    || \
     defined(__MINGW32__)                   || \
-    (defined(__sun) && defined(__SVR4))   // Solaris
+    (defined(__sun) && defined(__SVR4))   /* Solaris */
 #  define HAVE_FSEEKO 1
 #endif
