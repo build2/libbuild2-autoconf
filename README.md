@@ -456,24 +456,25 @@ in question is too obscure and should be rather kept in the project:
 2. The feature a check tries to detect is only available on one platform
    and is not likely to ever become available anywhere else. For example, a
    check detects presents of an idiosyncratic, OS-specific API (quite
-   common on Mac OS) that have no counterparts on other platforms.
+   common on Mac OS) that has no counterparts on other platforms.
 
 
 ## Stylistic guidelines for builtin checks
 
 When writing checks for the builtin catalog we require that you follow a
-number of stylistic guidelines described below in addition to the
-correctness rules described in the "Adding new checks" section above. The
-following check example illustrate many of the points discussed next:
+number of stylistic guidelines described below in addition to the correctness
+rules described in the "Adding new checks" section above. This helps with
+keeping the checks maintainable. The following example of a check illustrate
+many of the points discussed next:
 
 ```
 // HAVE_STRLCPY
 
-// NOTE: keep consistent with HAVE_STRLCAT.
+#undef HAVE_STRLCPY
 
 // TODO: available in glibc since 2.38.
 
-#undef HAVE_STRLCPY
+// NOTE: keep consistent with HAVE_STRLCAT.
 
 /* Check for the strlcpy() function.
  *
@@ -488,8 +489,10 @@ following check example illustrate many of the points discussed next:
 #endif
 ```
 
-1. Make sure this check is not already present in the builtin catalog,
-   potentially with a different name.
+1. Make sure the same check is not already present in the builtin catalog,
+   potentially with a different name. To accomplish this, search for a
+   component of a check name that is unlikely to vary (for example `strlcpy`)
+   in the contents of the existing checks.
 
 2. Use C-style comments except for information that should not be copied to
   `config.h` (for example, TODO notes).
@@ -518,13 +521,13 @@ following check example illustrate many of the points discussed next:
    `HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC`.
 
    For other entities (builtin types, instruction sets, etc) the canonical name
-   is typically just the entity name.
+   is typically just the entity name. For example, `HAVE_SSE4_2`.
 
    Note that if the entity includes leading underscore(s), include it (them)
    in the name (since there could also be a version without). For example:
    `__bswap_32()` becomes `HAVE___BSWAP_32`.
 
-5. Describe what the check is testing. Examples:
+5. Describe what the check is checking for. Examples:
 
    ```
    /* Check for the <sys/stat.h> header.
@@ -585,7 +588,7 @@ following check example illustrate many of the points discussed next:
    decipher. For example, the OpenBSD version in the check is specified as a
    date, not a version. More importantly, if there is a bug in the check, the
    description allows one to distinguish between an incorrect implementation
-   of a correct version checks and an incorrect version check.
+   of a correct assumption and an incorrect assumption.
 
    On Windows, it is fairly common for the functionality to be not available
    in MSVC with vanilla PlatformSDK but available in MinGW. This should be
@@ -608,8 +611,12 @@ following check example illustrate many of the points discussed next:
    ```
 
    This is redundant since if `__MINGW32__` is defined, `_WIN32` is always
-   defined as well.
+   defined as well. The correct version would be:
 
+   ```
+   /* Available on Windows including MinGW. */
+   #if defined(_WIN32)
+   ```
 
 8. Do not use one check to implement another (except for specific "base"
    checks, like `BUILD2_AUTOCONF_LIBC_VERSION`, that are meant to be
