@@ -231,8 +231,8 @@ build.
 The results of the checks can be communicated to `buildfiles` by combining two
 `build2` mechanisms: the [`c.predefs` rule][build2-predefs], which allows us
 to extract macro values from header files, and [the `update`
-directive][build2-udl], which allow us to update a target while load a
-`buildfile`. Specifically, we can extra macro values from the
+directive][build2-udl], which allow us to update a target while loading a
+`buildfile`. Specifically, we can extract macro values from the
 `autoconf`-generated header into a `buildfile` fragment (or a JSON file) and
 then include this fragment (or load this JSON file) into our `buildfile`.
 
@@ -304,9 +304,10 @@ exe{hello}: cxx{hello-little}: include = $little_endian
 
 There are two check catalogs: builtin, which is part of the `autoconf` module,
 and project-specific. Ideally, common checks which can be used by multiple
-projects should be added to the builtin rather than project catalog. In
-particular, this makes sure that fixes and improvement only need to be applied
-in one place rather than in all the projects that use the check.
+projects should be added to the builtin rather than project catalog (see
+"Which checks are considered common?" below for details). In particular, this
+makes sure that fixes and improvements only need to be applied in one place
+rather than in all the projects that use the check.
 
 Practically, however, there are several valid reasons why we may want to add a
 project-specific check:
@@ -324,9 +325,11 @@ project-specific check:
 4. Have a project-private check that is unlikely to be useful to any other
    project.
 
-Note also that adding a project check because the same builtin check has a
-different name is not a valid reason: this case should be handled with
-`autoconf.aliases` discussed above.
+Before adding a new check, verify the same checks does not already exist in
+the builtin catalog, potentially with a different name. Note that adding a
+project check because the same builtin check has a different name is not a
+valid reason: this case should be handled with `autoconf.aliases` discussed
+above.
 
 Checks from the project catalog take precedence over the builtin checks.
 However, to help detect cases where a project check can be dropped (items 1-3
@@ -335,17 +338,18 @@ the same name exists in both catalogs. It's recommended that private checks
 (item 4) use names that can never clash with builtin checks since such checks
 could be used as bases by other builtin checks (see below for details on base
 checks). This can be achieved, for example, by embedding the project name in
-the check name (use `autoconf.alias` to retain the original name in output).
+the check name (use `autoconf.aliases` to retain the original name in output).
 
-To add a new configuration check `<NAME>` simply create the `<NAME>.h` header
-file (preserving the case) which will contain the check's implementation (use
+To add a new configuration check `<NAME>` create the `<NAME>.h` header file
+(preserving the case) which will contain the check's implementation (use
 [existing checks][checks] for inspiration).
 
 Then, if this is a project-specific check, place it into the
 `build/autoconf/checks/` subdirectory of your project (or
 `build2/autoconf/checks/` if using the alternative naming scheme). And if this
 is a builtin check -- into [`libbuild2/autoconf/checks/`][checks] of
-`libbuild2-autoconf`.
+`libbuild2-autoconf`. For the latter, see also "Stylistic guidelines for
+builtin checks" below.
 
 The format and semantics of this header file are exactly the same for both
 project and builtin catalogs. Its first line must be in the form:
@@ -431,6 +435,222 @@ other checks to verify that the base macros are in fact defined, for example:
 
 ...
 ```
+
+## Which checks are considered common?
+
+As mentioned above, common checks should preferably be added to the builtin
+catalog rather than being part of multiple projects. But which checks are
+considered common? The key criterion is the likelihood of a check being used
+by multiple projects. However, when adding a check in a specific single
+project, it may not always be obvious whether it is likely to be useful to
+someone else. In fact, since you found it useful, chances are someone else
+will as well, in some potentially distant future. But we feel the bar for
+inclusion into the builtin catalog should be higher than that.
+
+If both of the following points hold then it's a strong indication the check
+in question is too obscure and should be rather kept in the project:
+
+1. No other project is using the same check (search the Internet for the
+   check name and its plausible alternative spellings).
+
+2. The feature a check tries to detect is only available on one platform
+   and is not likely to ever become available anywhere else. For example, a
+   check detects presence of an idiosyncratic, OS-specific API (quite
+   common on Mac OS) that has no counterparts on other platforms.
+
+
+## Stylistic guidelines for builtin checks
+
+When writing checks for the builtin catalog we require that you follow a
+number of stylistic guidelines described below in addition to the correctness
+rules described in the "Adding new checks" section above. This helps with
+keeping the checks maintainable. The following example of a check illustrate
+many of the points discussed next:
+
+```
+// HAVE_STRLCPY
+
+#undef HAVE_STRLCPY
+
+// TODO: available in glibc since 2.38.
+
+// NOTE: keep consistent with HAVE_STRLCAT.
+
+/* Check for the strlcpy() function.
+ *
+ * Available in BSDs and Mac OS since the beginning. Not available
+ * on Windows including MinGW or Linux/glibc. */
+ */
+#if defined(__FreeBSD__) || \
+    defined(__OpenBSD__) || \
+    defined(__NetBSD__)  || \
+    defined(__APPLE__)
+#  define HAVE_STRLCPY 1
+#endif
+```
+
+1. Make sure the same check is not already present in the builtin catalog,
+   potentially with a different name. To accomplish this, search for a
+   component of a check name that is unlikely to vary (for example `strlcpy`)
+   in the contents of the existing checks.
+
+2. Use C-style comments except for information that should not be copied to
+  `config.h` (for example, TODO notes).
+
+3. Use proper sentences in comments. That is, start each sentence with a
+   capital letter and end with a period.
+
+4. Use canonical check name even if your project doesn't (see
+   `autoconf.aliases` above).
+
+   For headers, the canonical name is the header name with `/` replaced with
+   `_` and ending with `_H`. For example, for `<sys/stat.h>` the canonical
+   check name is `HAVE_SYS_STAT_H`.
+
+   For functions and macros, the canonical name is just the function/macro
+   name. For example, for `strlcpy()` the canonical check name is
+   `HAVE_STRLCPY`.
+
+   For structs, the canonical name is the `STRUCT_` prefix followed by the
+   struct name. For example, for struct `stat` the canonical check name is
+   `HAVE_STRUCT_STAT`.
+
+   For struct data members, the canonical name is the `STRUCT_` prefix followed
+   by the struct name followed by the data member name. For example, for struct
+   `stat`'s `st_mtim.tv_nsec` data member the canonical check name is
+   `HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC`.
+
+   For other entities (builtin types, instruction sets, etc) the canonical name
+   is typically just the entity name. For example, `HAVE_SSE4_2`.
+
+   Note that if the entity includes leading underscore(s), include it (them)
+   in the name (since there could also be a version without). For example:
+   `__bswap_32()` becomes `HAVE___BSWAP_32`.
+
+5. Describe what the check is checking for. Examples:
+
+   ```
+   /* Check for the <sys/stat.h> header.
+    *
+    * ...
+    */
+   ```
+
+   ```
+   /* Check for the strlcpy() function.
+    *
+    * ...
+    */
+   ```
+
+   ```
+   /* Check for the stat struct.
+    *
+    * ...
+    */
+   ```
+
+   ```
+   /* Check for the st_mtim.tv_nsec data member in the stat struct.
+    *
+    *  ...
+    */
+   ```
+
+   For more obscure entities you may want to expand of what it is about. For
+   example:
+
+   ```
+   /* Check for the availability of the kCMVideoCodecType_VP9 constant.
+    * VP9 is an open-source video codec developed by Google.
+    *
+    *  ...
+    */
+   ```
+
+6. Describe in a comment on which platforms/versions the checked functionality
+   is present. Also list explicitly if it's not present on one of the main
+   platforms: Linux with glibc, Windows (including MinGW), and Mac OS. For
+   example:
+
+   ```
+   /* Check for the addrinfo struct.
+    *
+    * Available since Linux/glibc 2.4, OpenBSD 2.9, FreeBSD 3.5, NetBSD 1.5,
+    * and Mac OS (exact version is unclear but for a while now). Not available
+    * on Windows including MinGW.
+    */
+   ```
+
+   The reason for essentially describing what the check below does is
+   two-fold: Firstly, some check implementations might be hard to
+   decipher. For example, the OpenBSD version in the check is specified as a
+   date, not a version. More importantly, if there is a bug in the check, the
+   description allows one to distinguish between an incorrect implementation
+   of a correct assumption and an incorrect assumption.
+
+   On Windows, it is fairly common for the functionality to be not available
+   in MSVC with vanilla PlatformSDK but available in MinGW. This should be
+   noted.  The standard Windows description lines are:
+
+   ```
+   Not available on Windows including MinGW.
+   Not available on Windows except MinGW.
+   Available on Windows including MinGW.
+   Available on Windows except MinGW.
+   ```
+
+7. Avoid redundant macro checks.
+
+   The most common offender is checking for `_WIN32` or `__MINGW32__`:
+
+   ```
+   /* Available on Windows including MinGW. */
+   #if defined(_WIN32) || defined(__MINGW32__)
+   ```
+
+   This is redundant since if `__MINGW32__` is defined, `_WIN32` is always
+   defined as well. The correct version would be:
+
+   ```
+   /* Available on Windows including MinGW. */
+   #if defined(_WIN32)
+   ```
+
+8. Do not use one check to implement another (except for specific "base"
+   checks, like `BUILD2_AUTOCONF_LIBC_VERSION`, that are meant to be
+   used as bases). For example, this is incorrect:
+
+   ```
+   // HAVE_STRLCAT: HAVE_STRLCPY
+
+   #undef HAVE_STRLCAT
+
+   /* The same as strlcat() so just define it in its terms. */
+   #ifdef HAVE_STRLCPY
+   #  define HAVE_STRLCAT 1
+   #endif
+   ```
+
+   Instead, duplicate the same (for now) check in all places, potentially
+   adding a note to keep them consistent.
+
+9. If you are relying on another macro in your check, you should either
+   include the header that defines it (potentially different for different
+   platforms) or you should explicitly document in which situations (for
+   example, compiler options) it is predefined by the compiler.
+
+10. When submitting a pull request with a number of checks, squash them into
+    a single commit with the subject reading "Add number of common checks"
+    and the body listing all the added checks one per line. For example:
+
+    ```
+    Add number of common checks
+
+    HAVE_ACCESS
+    HAVE_FILENO
+    ...
+    ```
 
 [module-in]: https://build2.org/build2/doc/build2-build-system-manual.xhtml#module-in
 [proj-config]: https://build2.org/build2/doc/build2-build-system-manual.xhtml#proj-config
