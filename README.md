@@ -306,7 +306,7 @@ There are two check catalogs: builtin, which is part of the `autoconf` module,
 and project-specific. Ideally, common checks which can be used by multiple
 projects should be added to the builtin rather than project catalog (see
 "Which checks are considered common?" below for details). In particular, this
-makes sure that fixes and improvement only need to be applied in one place
+makes sure that fixes and improvements only need to be applied in one place
 rather than in all the projects that use the check.
 
 Practically, however, there are several valid reasons why we may want to add a
@@ -338,7 +338,7 @@ the same name exists in both catalogs. It's recommended that private checks
 (item 4) use names that can never clash with builtin checks since such checks
 could be used as bases by other builtin checks (see below for details on base
 checks). This can be achieved, for example, by embedding the project name in
-the check name (use `autoconf.alias` to retain the original name in output).
+the check name (use `autoconf.aliases` to retain the original name in output).
 
 To add a new configuration check `<NAME>` create the `<NAME>.h` header file
 (preserving the case) which will contain the check's implementation (use
@@ -455,7 +455,7 @@ in question is too obscure and should be rather kept in the project:
 
 2. The feature a check tries to detect is only available on one platform
    and is not likely to ever become available anywhere else. For example, a
-   check detects presents of an idiosyncratic, OS-specific API (quite
+   check detects presence of an idiosyncratic, OS-specific API (quite
    common on Mac OS) that has no counterparts on other platforms.
 
 
@@ -505,7 +505,7 @@ many of the points discussed next:
 
    For headers, the canonical name is the header name with `/` replaced with
    `_` and ending with `_H`. For example, for `<sys/stat.h>` the canonical
-   check name is `HAVE_SYS_STATE_H`.
+   check name is `HAVE_SYS_STAT_H`.
 
    For functions and macros, the canonical name is just the function/macro
    name. For example, for `strlcpy()` the canonical check name is
@@ -629,8 +629,8 @@ many of the points discussed next:
 
    /* The same as strlcat() so just define it in its terms. */
    #ifdef HAVE_STRLCPY
-   #  define HAVE_STRLCPY
-   #define
+   #  define HAVE_STRLCAT 1
+   #endif
    ```
 
    Instead, duplicate the same (for now) check in all places, potentially
