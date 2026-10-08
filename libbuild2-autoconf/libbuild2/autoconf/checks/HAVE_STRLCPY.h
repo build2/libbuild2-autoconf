@@ -6,7 +6,7 @@
 
 #undef HAVE_STRLCPY
 
-/* strl*() are available since glibc 2.38 but is only enabled if __USE_MISC
+/* strl*() are available since glibc 2.38 but are only enabled if __USE_MISC
    is defined (normally via _GNU_SOURCE or _DEFAULT_SOURCE). */
 
 #if defined(__FreeBSD__) || \
