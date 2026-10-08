@@ -16,7 +16,9 @@ ones. However, the values of these checks are not discovered by dynamic
 probing, such as trying to compile a test program to determine if the feature
 is present. Instead, they are set to static expected values based on the
 platform/compiler macro checks (see note at the beginning of [Project
-Configuration][proj-config] for rationale).
+Configuration][proj-config] for rationale). If for some reason (or for some
+special cases) you still wish to do configuration probing, this is also
+[possible](https://github.com/build2/HOWTO/blob/master/entries/implement-configuration-probing.md).
 
 See [`libbuild2/autoconf/checks/`][checks] for the list of available builtin
 checks. Submit requests for new checks as issues. Submit implementations of
