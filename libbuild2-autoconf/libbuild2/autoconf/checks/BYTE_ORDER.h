@@ -15,13 +15,16 @@
 #    define BIG_ENDIAN    __ORDER_BIG_ENDIAN__
 #    define LITTLE_ENDIAN __ORDER_LITTLE_ENDIAN__
 #  else
+#    if defined(__linux__)
+#      include <features.h> /* __GLIBC__ */
+#    endif
     /* Note that these headers normally define BYTE_ORDER, LITTLE_ENDIAN, and
      * BIG_ENDIAN. However, they can be affected by feature macros like
      * _ANSI_SOURCE, _POSIX_C_SOURCE, _XOPEN_SOURCE, or _NETBSD_SOURCE,
      * depending on the platform. In such cases they may define the
      * underscored versions only.
      */
-#    if defined(__GLIBC__) || defined(__OpenBSD__)
+#    if defined(__GLIBC__) || defined(__MUSL__) || defined(__OpenBSD__)
       /* POSIX header. Available on Linux, FreeBSD, but not MacOS.
        */
 #      include <endian.h>

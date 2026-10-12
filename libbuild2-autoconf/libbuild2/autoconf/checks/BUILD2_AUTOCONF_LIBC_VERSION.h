@@ -29,6 +29,7 @@
  * of the system macros below. For example:
  *
  * #if defined(__GLIBC__)
+ * #if defined(__MUSL__)
  * #if defined(__FreeBSD__)
  * #if defined(__OpenBSD__)
  * #if defined(__NetBSD__)
@@ -53,6 +54,9 @@
  * __GLIBC_PREREQ(major,minor): Return 1 if a given version number is greater
  *                              than or equal to the current glibc version
  *                              (__GLIBC__.__GLIBC_MINOR__), or 0 otherwise.
+ *
+ * __MUSL__: Defined by build2 if the Musl libc is used. No version is
+ *           available.
  *
  * __FreeBSD__: Defined if on FreeBSD. The value is the FreeBSD major version
  *              number but it's typically used only for OS detection. This is
